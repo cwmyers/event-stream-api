@@ -1,18 +1,24 @@
 package interpreter
 
 import app.action.AppAction.Script
-import app.action.{SaveEvent, AppAction, EventStoreAction}
+import app.action._
 import app.interpreter.AppInterpreter
 import infrastructure.FrameworkResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaz.{Monad, ~>}
 
-class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter)(implicit ec: ExecutionContext) extends AppInterpreter {
+class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
+                           idGenerator: IdGeneratorInterpreter,
+                           timeGenerator: TimeInterpreter)
+                         (implicit ec: ExecutionContext) extends AppInterpreter {
 
   val exe: AppAction ~> Future = new (AppAction ~> Future) {
     override def apply[A](fa: AppAction[A]): Future[A] = fa match {
       case a:SaveEvent[A] => eventStoreInterpreter.run(a)
+      case a:ListEvents[A] => eventStoreInterpreter.run(a)
+      case GenerateId(onResult) => Future(onResult(idGenerator()))
+      case CurrentTime(onResult) => Future(onResult(timeGenerator()))
     }
   }
 

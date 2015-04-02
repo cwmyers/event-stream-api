@@ -20,7 +20,11 @@ object Codecs {
       EncodeJson(e => jString(e.id)),
       jdecode1L((s:String) => EventId(s))("id"))
 
-  implicit def EventCodec: CodecJson[Event] = casecodec3(Event.apply, Event.unapply)("id", "timestamp", "body")
+  implicit def ReceivedEventCodec: CodecJson[ReceivedEvent] =
+    casecodec2(ReceivedEvent.apply, ReceivedEvent.unapply)("timestamp", "body")
+
+  implicit def EventCodec: CodecJson[Event] =
+    casecodec4(Event.apply, Event.unapply)("id", "createdTimestamp", "suppliedTimestamp", "body")
 
 
 }
