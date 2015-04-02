@@ -12,6 +12,8 @@ scalaVersion := "2.11.5"
 
 sbtVersion := "0.13.5"
 
+scalacOptions ++= Seq("-Xfatal-warnings")
+
 val unfilteredLibraryVersion = "0.8.4"
 
 resolvers += "gphat" at "https://raw.github.com/gphat/mvn-repo/master/releases/"

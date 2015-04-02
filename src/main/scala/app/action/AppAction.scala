@@ -1,5 +1,6 @@
 package app.action
 
+import app.action.AppAction.Script
 import app.model.{EventId, Event}
 
 import scalaz.Free._
@@ -8,9 +9,7 @@ import scalaz._
 sealed trait AppAction[A] {
   def map[B](f: A => B): AppAction[B] = this match {
 //    case DecodeAction(body, decoder, onResult) => DecodeAction(body, decoder, onResult andThen f)
-
     case SaveEvent(event, onResult) => SaveEvent(event, f compose onResult)
-
   }
 
 }
@@ -35,6 +34,6 @@ object AppAction {
 
 
 object EventStoreAction {
-  def saveEvent(event: Event) = liftF(SaveEvent[EventId](event, identity))
+  def saveEvent(event: Event):Script[EventId] = liftF(SaveEvent(event, identity))
 }
 

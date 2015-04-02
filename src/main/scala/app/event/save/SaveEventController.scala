@@ -20,7 +20,7 @@ object SaveEventController {
     val maybeEvent = request.body.decodeEither[Event]
     val saveEventAction = maybeEvent map EventStoreAction.saveEvent
     saveEventAction.fold[Script[FrameworkResponse]](a => noAction(BadRequest ~> ResponseString(a)),
-      action => action.map(_ => Created))
+      action => action.map(a => Created ~> ResponseString(a.id)))
 
   }
 

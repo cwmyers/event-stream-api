@@ -11,11 +11,16 @@ object Codecs {
 
   implicit def DateCodec: CodecJson[OffsetDateTime] = CodecJson.derived(
     EncodeJson[OffsetDateTime](d => jString(d.toString)),
-    DecodeJson.optionDecoder(_.string flatMap(dateString => Try(OffsetDateTime.parse(dateString)).toOption),
+    DecodeJson.optionDecoder(_.string flatMap (dateString => Try(OffsetDateTime.parse(dateString)).toOption),
       "Unable to parse date, it must be in ISO8601 format")
   )
 
-  implicit def EventCodec:CodecJson[Event] = casecodec2(Event.apply, Event.unapply)("timestamp","body")
+  implicit def EventIdCodec: CodecJson[EventId] =
+    CodecJson.derived(
+      EncodeJson(e => jString(e.id)),
+      jdecode1L((s:String) => EventId(s))("id"))
+
+  implicit def EventCodec: CodecJson[Event] = casecodec3(Event.apply, Event.unapply)("id", "timestamp", "body")
 
 
 }

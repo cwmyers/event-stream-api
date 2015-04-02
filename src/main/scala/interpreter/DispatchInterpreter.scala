@@ -1,7 +1,7 @@
 package interpreter
 
 import app.action.AppAction.Script
-import app.action.{AppAction, EventStoreAction}
+import app.action.{SaveEvent, AppAction, EventStoreAction}
 import app.interpreter.AppInterpreter
 import infrastructure.FrameworkResponse
 
@@ -12,7 +12,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter)(implicit
 
   val exe: AppAction ~> Future = new (AppAction ~> Future) {
     override def apply[A](fa: AppAction[A]): Future[A] = fa match {
-      case e: EventStoreAction[A] => eventStoreInterpreter.run(e)
+      case a:SaveEvent[A] => eventStoreInterpreter.run(a)
     }
   }
 

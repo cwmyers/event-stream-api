@@ -21,7 +21,7 @@ object Main extends AppServer {
 
   override def server: Server = unfiltered.netty.Server.http(port).makePlan(Planify(routes))
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]):Unit = {
     server.start()
   }
 
