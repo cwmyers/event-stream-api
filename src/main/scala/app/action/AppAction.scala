@@ -32,7 +32,7 @@ case class ListEventsForEntity[A](id:EntityId, onResult: List[Event] => A) exten
 object AppAction {
   type Script[A] = Free[AppAction, A]
 
-  implicit def appActionFunctor: Functor[AppAction] = new Functor[AppAction] {
+  implicit val appActionFunctor: Functor[AppAction] = new Functor[AppAction] {
     override def map[A, B](fa: AppAction[A])(f: (A) => B): AppAction[B] = fa map f
   }
 
