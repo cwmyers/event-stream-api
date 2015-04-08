@@ -13,7 +13,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
                            timeGenerator: TimeInterpreter)
                          (implicit ec: ExecutionContext) extends AppInterpreter {
 
-  val exe: AppAction ~> Future = new (AppAction ~> Future) {
+  val interpret: AppAction ~> Future = new (AppAction ~> Future) {
     override def apply[A](fa: AppAction[A]): Future[A] = fa match {
       case a:SaveEvent[A] => eventStoreInterpreter.run(a)
       case a:ListEvents[A] => eventStoreInterpreter.run(a)
@@ -23,7 +23,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
     }
   }
 
-  def run(appAction: Script[FrameworkResponse]): Future[FrameworkResponse] = appAction.foldMap(exe)
+  def run(appAction: Script[FrameworkResponse]): Future[FrameworkResponse] = appAction foldMap interpret
 
   implicit val futureMonadInstance = new Monad[Future] {
     override def bind[A, B](fa: Future[A])(f: (A) => Future[B]): Future[B] = fa flatMap f
