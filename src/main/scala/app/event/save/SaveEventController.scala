@@ -1,9 +1,8 @@
 package app.event.save
 
 import app.action.AppAction._
-import app.action.EventStoreAction._
 import app.model.Codecs._
-import app.model.{Event, ReceivedEvent}
+import app.model.ReceivedEvent
 import argonaut.Argonaut._
 import argonaut.integrate.unfiltered.JsonResponse
 import infrastructure._
@@ -15,16 +14,8 @@ object SaveEventController {
 
     val maybeEvent = request.body.decodeEither[ReceivedEvent]
 
-    def script(receivedEvent: ReceivedEvent) =
-      for {
-        id <- generateId
-        timestamp <- currentTime
-        event = Event.fromReceivedEvent(receivedEvent)(id, timestamp)
-        _ <- saveEvent(event)
-      } yield event
-
-    val saveEventAction = maybeEvent map script
-    saveEventAction.fold[Script[FrameworkResponse]](a => noAction(BadRequest ~> ResponseString(a)),
+    val saveEventAction = maybeEvent map SaveEventService.save
+    saveEventAction.fold[Script[FrameworkResponse]](error => noAction(BadRequest ~> ResponseString(error)),
       action => action.map(event => Created ~> JsonResponse(event)))
 
   }
