@@ -15,16 +15,20 @@ object Codecs {
       "Unable to parse date, it must be in ISO8601 format")
   )
 
-  implicit def EventIdCodec: CodecJson[EventId] =
+  implicit def EventIdCodec: CodecJson[EventId] = WrapperCodec(EventId, _.id)
+  implicit def EntityIdCodec: CodecJson[EntityId] = WrapperCodec(EntityId, _.id)
+
+  implicit def WrapperCodec[A](decode: String => A, encode: A => String): CodecJson[A] =
     CodecJson.derived(
-      EncodeJson(e => jString(e.id)),
-      jdecode1L((s:String) => EventId(s))("id"))
+      EncodeJson(e => jString(encode(e))),
+      DecodeJson(c => c.as[String] map decode))
+
 
   implicit def ReceivedEventCodec: CodecJson[ReceivedEvent] =
-    casecodec2(ReceivedEvent.apply, ReceivedEvent.unapply)("timestamp", "body")
+    casecodec3(ReceivedEvent.apply, ReceivedEvent.unapply)("entityId", "timestamp", "body")
 
   implicit def EventCodec: CodecJson[Event] =
-    casecodec4(Event.apply, Event.unapply)("id", "createdTimestamp", "suppliedTimestamp", "body")
+    casecodec5(Event.apply, Event.unapply)("id", "entityId", "createdTimestamp", "suppliedTimestamp", "body")
 
 
 }

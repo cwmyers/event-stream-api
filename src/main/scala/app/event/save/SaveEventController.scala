@@ -19,7 +19,7 @@ object SaveEventController {
       for {
         id <- generateId
         timestamp <- currentTime
-        event = Event(id, timestamp, receivedEvent.timestamp, receivedEvent.body)
+        event = Event.fromReceivedEvent(receivedEvent)(id, timestamp)
         _ <- saveEvent(event)
       } yield event
 
