@@ -1,3 +1,5 @@
+package app
+
 import java.time.OffsetDateTime
 
 import app.model.EventId

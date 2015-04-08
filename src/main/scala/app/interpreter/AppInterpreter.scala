@@ -1,7 +1,7 @@
 package app.interpreter
 
 import app.action.AppAction.Script
-import infrastructure._
+import app.infrastructure._
 
 import scala.concurrent.Future
 

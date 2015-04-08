@@ -1,4 +1,4 @@
-package interpreter
+package app.interpreter
 
 import app.action.EventStoreAction
 

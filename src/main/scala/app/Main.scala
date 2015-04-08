@@ -4,9 +4,9 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.concurrent.Executors
 
-import _root_.infrastructure.AppRuntime.frameworkifyRoutes
-import _root_.infrastructure.{AppServer, NoRoute}
-import _root_.interpreter.{DispatchInterpreter, IdGeneratorInterpreter, TestEventStoreInterpreter, TimeInterpreter}
+import app.infrastructure.AppRuntime.frameworkifyRoutes
+import app.infrastructure.{AppServer, NoRoute}
+import app.interpreter.{DispatchInterpreter, IdGeneratorInterpreter, TestEventStoreInterpreter, TimeInterpreter}
 import app.model.EventId
 import unfiltered.netty.Server
 import unfiltered.netty.future.Plan.Intent

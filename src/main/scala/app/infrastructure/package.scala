@@ -1,3 +1,5 @@
+package app
+
 import io.netty.handler.codec.http.HttpResponse
 import unfiltered.netty.ReceivedMessage
 

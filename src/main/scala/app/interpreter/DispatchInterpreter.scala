@@ -1,9 +1,8 @@
-package interpreter
+package app.interpreter
 
 import app.action.AppAction.Script
 import app.action._
-import app.interpreter.AppInterpreter
-import infrastructure.FrameworkResponse
+import app.infrastructure.FrameworkResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaz.{Monad, ~>}

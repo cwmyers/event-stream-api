@@ -1,4 +1,4 @@
-package infrastructure
+package app.infrastructure
 
 import app.Routes.AppRoutes
 import app.interpreter.AppInterpreter

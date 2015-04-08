@@ -1,4 +1,4 @@
-package infrastructure
+package app.infrastructure
 
 import unfiltered.netty.future.Plan.Intent
 import unfiltered.request.Path

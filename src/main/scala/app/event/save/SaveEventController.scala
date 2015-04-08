@@ -1,6 +1,7 @@
 package app.event.save
 
 import app.action.AppAction._
+import app.infrastructure
 import app.model.Codecs._
 import app.model.ReceivedEvent
 import argonaut.Argonaut._

@@ -1,6 +1,6 @@
-package interpreter
+package app.interpreter
 
-import app.action.{ListEventsForEntity, ListEvents, EventStoreAction, SaveEvent}
+import app.action.{EventStoreAction, ListEvents, ListEventsForEntity, SaveEvent}
 import app.model.Event
 
 import scala.collection.mutable

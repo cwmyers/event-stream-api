@@ -1,10 +1,10 @@
 package app
 
-import _root_.infrastructure.{FrameworkRequest, FrameworkResponse}
 import app.action.AppAction.Script
 import app.entity.get.GetEntityController
 import app.event.list.ListEventsController
 import app.event.save.SaveEventController
+import app.infrastructure.{FrameworkResponse, FrameworkRequest}
 import app.model.EntityId
 import unfiltered.request.{Seg, GET, POST, Path}
 

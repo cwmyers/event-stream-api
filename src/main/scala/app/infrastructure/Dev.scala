@@ -1,4 +1,4 @@
-package infrastructure
+package app.infrastructure
 
 import app.Main
 
