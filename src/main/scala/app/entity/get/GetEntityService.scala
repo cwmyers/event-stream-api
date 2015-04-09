@@ -1,15 +1,17 @@
 package app.entity.get
 
+import app.MaybeTime
 import app.action.EventStoreAction
-import app.model.{Event, EntityId}
+import app.model.{EntityId, Event}
 import argonaut.Json
 
-import scalaz._, Scalaz._
+import scalaz.Scalaz._
+import scalaz._
 
 object GetEntityService {
 
-  def getEntity(id: EntityId) =
-    EventStoreAction.listEventsForEntity(id) map
+  def getEntity(id: EntityId, time:MaybeTime) =
+    EventStoreAction.listEventsForEntity(id, None, time) map
       (events => replayEvents(events))
 
   private def replayEvents(events: List[Event]): Json =

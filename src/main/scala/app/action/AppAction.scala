@@ -2,6 +2,7 @@ package app.action
 
 import java.time.OffsetDateTime
 
+import app.MaybeTime
 import app.action.AppAction.Script
 import app.model.{EntityId, Event, EventId}
 
@@ -14,7 +15,7 @@ sealed trait AppAction[A] {
     case ListEvents(onResult) => ListEvents(onResult andThen f)
     case GenerateId(onResult) => GenerateId(onResult andThen f)
     case CurrentTime(onResult) => CurrentTime(onResult andThen f)
-    case ListEventsForEntity(id, onResult) => ListEventsForEntity(id, onResult andThen f)
+    case ListEventsForEntity(id, from, to, onResult) => ListEventsForEntity(id, from, to, onResult andThen f)
   }
 
   def lift: Script[A] = liftF(this)
@@ -26,7 +27,7 @@ case class CurrentTime[A](onResult: OffsetDateTime => A) extends AppAction[A]
 sealed trait EventStoreAction[A]
 case class SaveEvent[A](event: Event, next: A) extends AppAction[A] with EventStoreAction[A]
 case class ListEvents[A](onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
-case class ListEventsForEntity[A](id:EntityId, onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
+case class ListEventsForEntity[A](id:EntityId, from: Option[OffsetDateTime], to:Option[OffsetDateTime], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
 
 
 object AppAction {
@@ -45,6 +46,7 @@ object AppAction {
 object EventStoreAction {
   def saveEvent(event: Event): Script[Unit] = SaveEvent(event, ()).lift
   def listEvents: Script[List[Event]] = ListEvents(identity).lift
-  def listEventsForEntity(id: EntityId): Script[List[Event]] = ListEventsForEntity(id, identity).lift
+  def listEventsForEntity(id: EntityId, from: MaybeTime = None, to: MaybeTime = None): Script[List[Event]] =
+    ListEventsForEntity(id, from, to, identity).lift
 }
 

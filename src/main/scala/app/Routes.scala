@@ -15,7 +15,7 @@ object Routes {
   def appRoutes: AppRoutes = {
     case req@POST(Path("/event")) => SaveEventController.save(req)
     case GET(Path("/event")) => ListEventsController.list
-    case GET(Path(Seg("entity" :: entityId :: Nil))) => GetEntityController.get(EntityId(entityId))
+    case req@GET(Path(Seg("entity" :: entityId :: Nil))) => GetEntityController.get(EntityId(entityId), req)
   }
 
 }

@@ -39,4 +39,4 @@ libraryDependencies ++= Seq(
 
 mainClass in Compile := Some("app.Main") //Used in Universal packageBin
 
-mainClass in (Compile, run) := Some("infrastructure.Dev") //Used from normal sbt
+mainClass in (Compile, run) := Some("app.infrastructure.Dev") //Used from normal sbt
