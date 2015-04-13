@@ -17,6 +17,7 @@ object Codecs {
 
   implicit def EventIdCodec: CodecJson[EventId] = WrapperCodec(EventId, _.id)
   implicit def EntityIdCodec: CodecJson[EntityId] = WrapperCodec(EntityId, _.id)
+  implicit def SnapshotIdCodec: CodecJson[SnapshotId] = WrapperCodec(SnapshotId, _.id)
 
   implicit def WrapperCodec[A](decode: String => A, encode: A => String): CodecJson[A] =
     CodecJson.derived(
@@ -29,6 +30,8 @@ object Codecs {
 
   implicit def EventCodec: CodecJson[Event] =
     casecodec5(Event.apply, Event.unapply)("id", "entityId", "createdTimestamp", "suppliedTimestamp", "body")
+
+  implicit def SnapshotEncoder: EncodeJson[Snapshot] = jencode3L(Snapshot.unapply _ andThen (_.get))("id", "timestamp", "body")
 
 
 }

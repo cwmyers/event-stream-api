@@ -7,7 +7,6 @@ import java.util.concurrent.Executors
 import app.infrastructure.AppRuntime.frameworkifyRoutes
 import app.infrastructure.{AppServer, NoRoute}
 import app.interpreter.{DispatchInterpreter, IdGeneratorInterpreter, TestEventStoreInterpreter, TimeInterpreter}
-import app.model.EventId
 import unfiltered.netty.Server
 import unfiltered.netty.future.Plan.Intent
 import unfiltered.netty.future.Planify
@@ -19,7 +18,7 @@ object Main extends AppServer {
   val port = 9090
 
   private val idGenerator: IdGeneratorInterpreter =
-    () => EventId(UUID.randomUUID().toString)
+    () => UUID.randomUUID().toString
 
   private val timeGenerator: TimeInterpreter = () => OffsetDateTime.now()
 

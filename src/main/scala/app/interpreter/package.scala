@@ -7,6 +7,6 @@ import app.model.EventId
 package object interpreter {
 
   type TimeInterpreter = () => OffsetDateTime
-  type IdGeneratorInterpreter = () => EventId
+  type IdGeneratorInterpreter = () => String
 
 }
