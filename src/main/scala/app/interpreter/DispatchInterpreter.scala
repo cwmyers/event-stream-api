@@ -18,6 +18,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
       case a:ListEvents[A] => eventStoreInterpreter.run(a)
       case a:ListEventsForEntity[A] => eventStoreInterpreter.run(a)
       case a:SaveSnapshot[A] => eventStoreInterpreter.run(a)
+      case a:GetEventsCount[A] => eventStoreInterpreter.run(a)
       case GenerateId(onResult) => Future(onResult(idGenerator()))
       case CurrentTime(onResult) => Future(onResult(timeGenerator()))
     }

@@ -12,11 +12,12 @@ import scalaz._
 sealed trait AppAction[A] {
   def map[B](f: A => B): AppAction[B] = this match {
     case SaveEvent(event, next) => SaveEvent(event, f(next))
-    case ListEvents(onResult) => ListEvents(onResult andThen f)
+    case ListEvents(pageSize, pageNumber, onResult) => ListEvents(pageSize, pageNumber, onResult andThen f)
     case GenerateId(onResult) => GenerateId(onResult andThen f)
     case CurrentTime(onResult) => CurrentTime(onResult andThen f)
     case ListEventsForEntity(id, from, to, onResult) => ListEventsForEntity(id, from, to, onResult andThen f)
     case SaveSnapshot(snapshot, next) => SaveSnapshot(snapshot, f(next))
+    case GetEventsCount(onResult) => GetEventsCount(onResult andThen f)
   }
 
   def lift: Script[A] = liftF(this)
@@ -27,10 +28,10 @@ case class CurrentTime[A](onResult: OffsetDateTime => A) extends AppAction[A]
 
 sealed trait EventStoreAction[A]
 case class SaveEvent[A](event: Event, next: A) extends AppAction[A] with EventStoreAction[A]
-case class ListEvents[A](onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
+case class ListEvents[A](pageSize:Int, pageNumber: Option[Long], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
 case class ListEventsForEntity[A](id:EntityId, from: Option[OffsetDateTime], to:Option[OffsetDateTime], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
-
 case class SaveSnapshot[A](snapshot: Snapshot, next: A) extends AppAction[A] with EventStoreAction[A]
+case class GetEventsCount[A](onResult:Long => A) extends AppAction[A] with EventStoreAction[A]
 
 
 object AppAction {
@@ -50,8 +51,9 @@ object AppAction {
 
 
 object EventStoreAction {
+  def getEventsCount:Script[Long] = GetEventsCount(identity).lift
   def saveEvent(event: Event): Script[Unit] = SaveEvent(event, ()).lift
-  def listEvents: Script[List[Event]] = ListEvents(identity).lift
+  def listEvents(pageSize:Int, pageNumber:Option[Long]=None): Script[List[Event]] = ListEvents(pageSize, pageNumber, identity).lift
   def listEventsForEntity(id: EntityId, from: MaybeTime = None, to: MaybeTime = None): Script[List[Event]] =
     ListEventsForEntity(id, from, to, identity).lift
 

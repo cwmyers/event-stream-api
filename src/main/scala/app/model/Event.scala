@@ -1,8 +1,8 @@
 package app.model
 
 import java.time.OffsetDateTime
+
 import argonaut.Json
-import scalaz._, Scalaz._
 
 
 case class EventId(id: String) extends AnyVal
@@ -23,8 +23,7 @@ object Event {
     Event(_:EventId,receivedEvent.entityId, _:OffsetDateTime, receivedEvent.timestamp, receivedEvent.body)
 
   def replayEvents(events: List[Event]): Json = {
-    import app.jsonMonoid
-    events.map(_.body).suml
+    events.map(_.body).foldLeft(Json())(_ deepmerge _)
   }
 
 }
