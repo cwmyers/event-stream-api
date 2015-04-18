@@ -8,7 +8,7 @@ import app.model.Event.replayEvents
 object GetEntityService {
 
   def getEntity(id: EntityId, time: MaybeTime) =
-    EventStoreAction.listEventsForEntity(id, None, time) map
+    EventStoreAction.listEventsByRange(id, None, time) map
       (events => replayEvents(events))
 
 }

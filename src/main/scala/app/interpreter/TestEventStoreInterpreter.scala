@@ -18,16 +18,18 @@ class TestEventStoreInterpreter(implicit ec: ExecutionContext) extends EventStor
 
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = eventStoreAction match {
     case SaveEvent(event, next) => mutableEventMap += (event.id.id -> event); Future(next)
-    case ListEvents(pageSize, pageNumber, onResult) => Future(
+    case ListEvents(entityId, pageSize, pageNumber, onResult) => Future(
       onResult {
-        val allEvents: List[Event] = mutableEventMap.toList.map(_._2).sortBy(_.suppliedTimestamp)
-        pageNumber.fold(allEvents.takeRight(pageSize)){p =>
+        val all: List[Event] = mutableEventMap.toList.map(_._2)
+        val filtered: List[Event] = entityId.fold(all)(id => all.filter(_.entityId == id))
+        val sorted: List[Event] = filtered.sortBy(_.suppliedTimestamp)
+        pageNumber.fold(sorted.takeRight(pageSize)){p =>
           val startIndex = p.toInt*pageSize
           val endIndex = startIndex + pageSize
-          allEvents.slice(startIndex, endIndex)
+          sorted.slice(startIndex, endIndex)
         }
       })
-    case ListEventsForEntity(entityId, from, to, onResult) =>
+    case ListEventsByRange(entityId, from, to, onResult) =>
       Future {
         val eventsForEntity = mutableEventMap.filter {
           case (eventId, event) => event.entityId == entityId &&
@@ -39,6 +41,9 @@ class TestEventStoreInterpreter(implicit ec: ExecutionContext) extends EventStor
         onResult(orderedEvents)
       }
     case SaveSnapshot(snapshot, next) => mutableSnapshotMap += (snapshot.id.id -> snapshot); Future(next)
-    case GetEventsCount(onResult) => Future(onResult(mutableEventMap.size))
+    case GetEventsCount(entityId, onResult) => Future(onResult{
+      val events = entityId.fold(mutableEventMap)(id => mutableEventMap.filter{case (key,entity) => entity.id.id == id.id})
+      events.size
+    })
   }
 }

@@ -16,7 +16,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
     override def apply[A](fa: AppAction[A]): Future[A] = fa match {
       case a:SaveEvent[A] => eventStoreInterpreter.run(a)
       case a:ListEvents[A] => eventStoreInterpreter.run(a)
-      case a:ListEventsForEntity[A] => eventStoreInterpreter.run(a)
+      case a:ListEventsByRange[A] => eventStoreInterpreter.run(a)
       case a:SaveSnapshot[A] => eventStoreInterpreter.run(a)
       case a:GetEventsCount[A] => eventStoreInterpreter.run(a)
       case GenerateId(onResult) => Future(onResult(idGenerator()))
