@@ -5,7 +5,7 @@ import java.util.UUID
 import java.util.concurrent.Executors
 
 import app.infrastructure.AppRuntime.frameworkifyRoutes
-import app.infrastructure.{AppServer, NoRoute}
+import app.infrastructure.{Config, AppServer, NoRoute}
 import app.interpreter.{DispatchInterpreter, IdGeneratorInterpreter, TestEventStoreInterpreter, TimeInterpreter}
 import unfiltered.netty.Server
 import unfiltered.netty.future.Plan.Intent
@@ -22,7 +22,7 @@ object Main extends AppServer {
 
   private val timeGenerator: TimeInterpreter = () => OffsetDateTime.now()
 
-  private val configInterpreter = () => 10
+  private val configInterpreter = () => Config(defaultPageSize = 10)
 
   private val interpreter = new DispatchInterpreter(new TestEventStoreInterpreter,
     idGenerator, timeGenerator, configInterpreter)

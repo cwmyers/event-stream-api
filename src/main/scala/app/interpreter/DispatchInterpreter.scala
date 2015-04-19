@@ -22,7 +22,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
       case a:GetEventsCount[A] => eventStoreInterpreter.run(a)
       case GenerateId(onResult) => Future(onResult(idGenerator()))
       case CurrentTime(onResult) => Future(onResult(timeGenerator()))
-      case GetDefaultPageSize(onResult) => Future(onResult(configInterpreter()))
+      case GetConfig(onResult) => Future(onResult(configInterpreter()))
     }
   }
 

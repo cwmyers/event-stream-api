@@ -17,8 +17,8 @@ object ListEventsService {
   case class LinkedResponse(events: List[Event], pageNumber: Option[Long], pageSize: Int, links: Links)
 
   def getEvents(entityId: Option[EntityId], maybePageSize: Option[Int], pageNumber: Option[Long]): Script[LinkedResponse] = for {
-    defaultPageSize <- AppAction.getDefaultPageSize
-    pageSize = maybePageSize.getOrElse(defaultPageSize)
+    config <- AppAction.getConfig
+    pageSize = maybePageSize.getOrElse(config.defaultPageSize)
     events <- listEvents(entityId, pageSize, pageNumber)
     totalCount <- getEventsCount(entityId)
     lastPage = Math.max((totalCount/pageSize)-1,0)
