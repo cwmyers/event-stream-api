@@ -9,7 +9,8 @@ import scalaz.{Monad, ~>}
 
 class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
                            idGenerator: IdGeneratorInterpreter,
-                           timeGenerator: TimeInterpreter)
+                           timeGenerator: TimeInterpreter,
+                           configInterpreter: ConfigInterpreter)
                          (implicit ec: ExecutionContext) extends AppInterpreter {
 
   val interpret: AppAction ~> Future = new (AppAction ~> Future) {
@@ -21,6 +22,7 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
       case a:GetEventsCount[A] => eventStoreInterpreter.run(a)
       case GenerateId(onResult) => Future(onResult(idGenerator()))
       case CurrentTime(onResult) => Future(onResult(timeGenerator()))
+      case GetDefaultPageSize(onResult) => Future(onResult(configInterpreter()))
     }
   }
 

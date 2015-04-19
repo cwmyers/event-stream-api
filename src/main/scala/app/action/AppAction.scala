@@ -18,6 +18,7 @@ sealed trait AppAction[A] {
     case ListEventsByRange(id, from, to, onResult) => ListEventsByRange(id, from, to, onResult andThen f)
     case SaveSnapshot(snapshot, next) => SaveSnapshot(snapshot, f(next))
     case GetEventsCount(entityId, onResult) => GetEventsCount(entityId, onResult andThen f)
+    case GetDefaultPageSize(onResult) => GetDefaultPageSize(onResult andThen f)
   }
 
   def lift: Script[A] = liftF(this)
@@ -25,6 +26,7 @@ sealed trait AppAction[A] {
 
 case class GenerateId[A](onResult: String => A) extends AppAction[A]
 case class CurrentTime[A](onResult: OffsetDateTime => A) extends AppAction[A]
+case class GetDefaultPageSize[A](onResult: Int => A) extends AppAction[A]
 
 sealed trait EventStoreAction[A]
 case class SaveEvent[A](event: Event, next: A) extends AppAction[A] with EventStoreAction[A]
@@ -47,6 +49,8 @@ object AppAction {
   def generateSnapshotId: Script[SnapshotId] = generateId map SnapshotId
 
   def currentTime: Script[OffsetDateTime] = CurrentTime(identity).lift
+
+  def getDefaultPageSize: Script[Int] = GetDefaultPageSize(identity).lift
 }
 
 

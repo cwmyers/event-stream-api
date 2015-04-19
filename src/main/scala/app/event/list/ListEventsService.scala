@@ -1,9 +1,12 @@
 package app.event.list
 
+import app.action.AppAction
 import app.action.AppAction.Script
-import app.action.EventStoreAction
+import app.action.EventStoreAction.{getEventsCount, listEvents}
 import app.model.{EntityId, Event}
-import scalaz._, Scalaz._
+
+import scalaz.Scalaz._
+import scalaz._
 
 object ListEventsService {
   case class URI(url:String) extends AnyVal
@@ -13,9 +16,11 @@ object ListEventsService {
 
   case class LinkedResponse(events: List[Event], pageNumber: Option[Long], pageSize: Int, links: Links)
 
-  def getEvents(entityId: Option[EntityId],pageSize: Int, pageNumber: Option[Long]): Script[LinkedResponse] = for {
-    events <- EventStoreAction.listEvents(entityId, pageSize, pageNumber)
-    totalCount <- EventStoreAction.getEventsCount(entityId)
+  def getEvents(entityId: Option[EntityId], maybePageSize: Option[Int], pageNumber: Option[Long]): Script[LinkedResponse] = for {
+    defaultPageSize <- AppAction.getDefaultPageSize
+    pageSize = maybePageSize.getOrElse(defaultPageSize)
+    events <- listEvents(entityId, pageSize, pageNumber)
+    totalCount <- getEventsCount(entityId)
     lastPage = Math.max((totalCount/pageSize)-1,0)
   } yield LinkedResponse(events, pageNumber, pageSize, createLinks(entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize))
 

@@ -8,5 +8,6 @@ package object interpreter {
 
   type TimeInterpreter = () => OffsetDateTime
   type IdGeneratorInterpreter = () => String
+  type ConfigInterpreter = () => Int
 
 }

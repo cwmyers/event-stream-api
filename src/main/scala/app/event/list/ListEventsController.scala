@@ -18,7 +18,7 @@ object ListEventsController {
     getEvents(request, entityId.some)
 
   def getEvents(request: FrameworkRequest, entityId: Option[EntityId]): Script[FrameworkResponse] = {
-    val pageSize = getFromRequest(request, "pageSize").flatMap(_.parseInt.toOption).getOrElse(10)
+    val pageSize = getFromRequest(request, "pageSize").flatMap(_.parseInt.toOption)
     val pageNumber = getFromRequest(request, "pageNumber").flatMap(_.parseLong.toOption)
     ListEventsService.getEvents(entityId, pageSize, pageNumber) map (events => Ok ~> JsonResponse(events))
   }

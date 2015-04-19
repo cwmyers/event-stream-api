@@ -22,8 +22,11 @@ object Main extends AppServer {
 
   private val timeGenerator: TimeInterpreter = () => OffsetDateTime.now()
 
+  private val configInterpreter = () => 10
+
   private val interpreter = new DispatchInterpreter(new TestEventStoreInterpreter,
-    idGenerator, timeGenerator)
+    idGenerator, timeGenerator, configInterpreter)
+
 
   val appRoutes = frameworkifyRoutes(Routes.appRoutes, interpreter)
 
