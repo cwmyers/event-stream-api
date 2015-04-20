@@ -2,9 +2,8 @@ package app.model
 
 import java.time.OffsetDateTime
 
-import app.event.list.ListEventsService.{URI, LinkedResponse, Links}
 import argonaut.Argonaut._
-import argonaut.{DecodeJson, EncodeJson, CodecJson}
+import argonaut.{CodecJson, DecodeJson, EncodeJson}
 
 import scala.util.Try
 
@@ -33,7 +32,7 @@ object Codecs {
   implicit def EventCodec: CodecJson[Event] =
     casecodec5(Event.apply, Event.unapply)("id", "entityId", "createdTimestamp", "suppliedTimestamp", "body")
 
-  implicit def SnapshotEncoder: EncodeJson[Snapshot] = jencode3L(Snapshot.unapply _ andThen (_.get))("id", "timestamp", "body")
+  implicit def SnapshotEncoder: EncodeJson[Snapshot] = jencode4L(Snapshot.unapply _ andThen (_.get))("id", "entityId", "timestamp", "body")
 
   implicit def LinksEncoder: EncodeJson[Links] = jencode4L(Links.unapply _ andThen (_.get))("self", "first", "next", "prev")
 

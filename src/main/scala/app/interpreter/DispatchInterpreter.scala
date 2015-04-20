@@ -10,7 +10,8 @@ import scalaz.{Monad, ~>}
 class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
                            idGenerator: IdGeneratorInterpreter,
                            timeGenerator: TimeInterpreter,
-                           configInterpreter: ConfigInterpreter)
+                           configInterpreter: ConfigInterpreter,
+                           loggingInterpreter: LoggingInterpreter)
                          (implicit ec: ExecutionContext) extends AppInterpreter {
 
   val interpret: AppAction ~> Future = new (AppAction ~> Future) {
@@ -20,9 +21,11 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
       case a:ListEventsByRange[A] => eventStoreInterpreter.run(a)
       case a:SaveSnapshot[A] => eventStoreInterpreter.run(a)
       case a:GetEventsCount[A] => eventStoreInterpreter.run(a)
+      case a:GetLatestSnapshot[A] => eventStoreInterpreter.run(a)
       case GenerateId(onResult) => Future(onResult(idGenerator()))
       case CurrentTime(onResult) => Future(onResult(timeGenerator()))
       case GetConfig(onResult) => Future(onResult(configInterpreter()))
+      case LogAction(log, next) => Future{loggingInterpreter.log(log); next}
     }
   }
 

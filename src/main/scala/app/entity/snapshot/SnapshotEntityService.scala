@@ -7,11 +7,11 @@ import app.action.{AppAction, EventStoreAction}
 import app.model.{EntityId, Event, Snapshot}
 
 object SnapshotEntityService {
-  def snapshot(id: EntityId, time: OffsetDateTime):Script[Snapshot] =
+  def snapshot(entityId: EntityId, time: OffsetDateTime):Script[Snapshot] =
     for {
-      current <- EventStoreAction.listEventsByRange(id, None, Some(time)) map Event.replayEvents
+      current <- EventStoreAction.listEventsByRange(entityId, None, time) map (Event.replayEvents(None,_))
       id <- AppAction.generateSnapshotId
-      s = Snapshot(id, time, current)
+      s = Snapshot(id, entityId, time, current)
       _ <- EventStoreAction.saveSnapshot(s)
     } yield s
 

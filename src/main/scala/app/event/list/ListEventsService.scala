@@ -3,18 +3,11 @@ package app.event.list
 import app.action.AppAction
 import app.action.AppAction.Script
 import app.action.EventStoreAction.{getEventsCount, listEvents}
-import app.model.{EntityId, Event}
+import app.model._
 
 import scalaz.Scalaz._
-import scalaz._
 
 object ListEventsService {
-  case class URI(url:String) extends AnyVal
-
-  case class Links(selfPageUrl: URI, firstPageUrl: URI,
-                   nextPageUrl: Option[URI], previousPageUrl: Option[URI])
-
-  case class LinkedResponse(events: List[Event], pageNumber: Option[Long], pageSize: Int, links: Links)
 
   def getEvents(entityId: Option[EntityId], maybePageSize: Option[Int], pageNumber: Option[Long]): Script[LinkedResponse] = for {
     config <- AppAction.getConfig

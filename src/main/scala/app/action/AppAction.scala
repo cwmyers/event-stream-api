@@ -5,6 +5,7 @@ import java.time.OffsetDateTime
 import app.MaybeTime
 import app.action.AppAction.Script
 import app.infrastructure.Config
+import app.logging.AppLog
 import app.model._
 
 import scalaz.Free._
@@ -18,8 +19,10 @@ sealed trait AppAction[A] {
     case CurrentTime(onResult) => CurrentTime(onResult andThen f)
     case ListEventsByRange(id, from, to, onResult) => ListEventsByRange(id, from, to, onResult andThen f)
     case SaveSnapshot(snapshot, next) => SaveSnapshot(snapshot, f(next))
+    case GetLatestSnapshot(entityId, time, onResult) => GetLatestSnapshot(entityId, time, onResult andThen f)
     case GetEventsCount(entityId, onResult) => GetEventsCount(entityId, onResult andThen f)
     case GetConfig(onResult) => GetConfig(onResult andThen f)
+    case LogAction(appLog, next) => LogAction(appLog, f(next))
   }
 
   def lift: Script[A] = liftF(this)
@@ -28,13 +31,15 @@ sealed trait AppAction[A] {
 case class GenerateId[A](onResult: String => A) extends AppAction[A]
 case class CurrentTime[A](onResult: OffsetDateTime => A) extends AppAction[A]
 case class GetConfig[A](onResult: Config => A) extends AppAction[A]
+case class LogAction[A](log: AppLog, next:A) extends AppAction[A]
 
 sealed trait EventStoreAction[A]
 case class SaveEvent[A](event: Event, next: A) extends AppAction[A] with EventStoreAction[A]
 case class ListEvents[A](entityId:Option[EntityId], pageSize:Int, pageNumber: Option[Long], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
-case class ListEventsByRange[A](id:EntityId, from: Option[OffsetDateTime], to:Option[OffsetDateTime], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
+case class ListEventsByRange[A](id:EntityId, from: Option[OffsetDateTime], to:OffsetDateTime, onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
 case class SaveSnapshot[A](snapshot: Snapshot, next: A) extends AppAction[A] with EventStoreAction[A]
 case class GetEventsCount[A](entityId: Option[EntityId], onResult:Long => A) extends AppAction[A] with EventStoreAction[A]
+case class GetLatestSnapshot[A](entityId: EntityId, time: OffsetDateTime, onResult:Option[Snapshot] => A) extends AppAction[A] with EventStoreAction[A]
 
 
 object AppAction {
@@ -52,6 +57,8 @@ object AppAction {
   def currentTime: Script[OffsetDateTime] = CurrentTime(identity).lift
 
   def getConfig: Script[Config] = GetConfig(identity).lift
+
+  def log(appLog: AppLog): Script[Unit] = LogAction(appLog, ()).lift
 }
 
 
@@ -59,9 +66,10 @@ object EventStoreAction {
   def getEventsCount(entityId: Option[EntityId]):Script[Long] = GetEventsCount(entityId, identity).lift
   def saveEvent(event: Event): Script[Unit] = SaveEvent(event, ()).lift
   def listEvents(entityId: Option[EntityId], pageSize:Int, pageNumber:Option[Long]): Script[List[Event]] = ListEvents(entityId, pageSize, pageNumber, identity).lift
-  def listEventsByRange(id: EntityId, from: MaybeTime = None, to: MaybeTime = None): Script[List[Event]] =
+  def listEventsByRange(id: EntityId, from: MaybeTime, to: OffsetDateTime): Script[List[Event]] =
     ListEventsByRange(id, from, to, identity).lift
 
   def saveSnapshot(snapshot: Snapshot): Script[Unit] = SaveSnapshot(snapshot, ()).lift
+  def getLatestSnapshotBefore(id: EntityId, time:OffsetDateTime): Script[Option[Snapshot]] = GetLatestSnapshot(id, time, identity).lift
 }
 
