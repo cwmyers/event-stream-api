@@ -44,7 +44,12 @@ class TestEventStoreInterpreter(implicit ec: ExecutionContext) extends EventStor
         next
 
       case GetLatestSnapshot(entityId, time, onResult) =>
-        onResult(mutableSnapshotMap.filter { case (id, snapshot) => snapshot.entityId.id == entityId.id}.toList.map(_._2).sortBy(_.timestamp).find(_.timestamp.isBefore(time)))
+        onResult(mutableSnapshotMap.filter {
+          case (id, snapshot) => snapshot.entityId.id == entityId.id
+        }.toList.map(_._2)
+          .sortBy(_.timestamp)
+          .reverse
+          .find(_.timestamp.isBefore(time)))
 
       case GetEventsCount(entityId, onResult) => onResult {
         val events = entityId.fold(mutableEventMap)(id => mutableEventMap.filter { case (key, entity) => entity.id.id == id.id})

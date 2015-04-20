@@ -30,8 +30,12 @@ object Event {
   def fromReceivedEvent(receivedEvent: ReceivedEvent) =
     Event(_:EventId,receivedEvent.entityId, _:OffsetDateTime, receivedEvent.timestamp, receivedEvent.body)
 
-  def replayEvents(snapshot: Option[Snapshot], events: List[Event]): Json = {
-    events.map(_.body).foldLeft(snapshot.fold(Json())(_.body))(_ deepmerge _)
-  }
+  def replayEvents(events: List[Event]) = replayJsonEvents(events.map(_.body))
+
+  def replayEventsWithSnapshot(snapshot: Option[Snapshot], events: List[Event]): Json =
+    replayJsonEvents(snapshot.fold(Json())(_.body) :: events.map(_.body))
+
+  def replayJsonEvents(events:List[Json]): Json =
+    events.foldLeft(Json())(_ deepmerge _)
 
 }
