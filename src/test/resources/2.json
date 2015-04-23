@@ -1,0 +1,8 @@
+{
+  "entityId": "abc",
+  "systemName": "customer",
+  "timestamp": "2001-01-02T13:00:00Z",
+  "body": {
+    "lastName": "Mills"
+  }
+}

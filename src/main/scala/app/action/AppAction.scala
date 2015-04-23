@@ -14,13 +14,16 @@ import scalaz._
 sealed trait AppAction[A] {
   def map[B](f: A => B): AppAction[B] = this match {
     case SaveEvent(event, next) => SaveEvent(event, f(next))
-    case ListEvents(entityId, pageSize, pageNumber, onResult) => ListEvents(entityId, pageSize, pageNumber, onResult andThen f)
+    case ListEvents(entityId, systemName, pageSize, pageNumber, onResult) =>
+      ListEvents(entityId, systemName, pageSize, pageNumber, onResult andThen f)
     case GenerateId(onResult) => GenerateId(onResult andThen f)
     case CurrentTime(onResult) => CurrentTime(onResult andThen f)
-    case ListEventsByRange(id, from, to, onResult) => ListEventsByRange(id, from, to, onResult andThen f)
+    case ListEventsByRange(id, systemName, from, to, onResult) =>
+      ListEventsByRange(id, systemName, from, to, onResult andThen f)
     case SaveSnapshot(snapshot, next) => SaveSnapshot(snapshot, f(next))
-    case GetLatestSnapshot(entityId, time, onResult) => GetLatestSnapshot(entityId, time, onResult andThen f)
-    case GetEventsCount(entityId, onResult) => GetEventsCount(entityId, onResult andThen f)
+    case GetLatestSnapshot(entityId, systemName, time, onResult) =>
+      GetLatestSnapshot(entityId, systemName, time, onResult andThen f)
+    case GetEventsCount(entityId, systemName, onResult) => GetEventsCount(entityId, systemName, onResult andThen f)
     case GetConfig(onResult) => GetConfig(onResult andThen f)
     case LogAction(appLog, next) => LogAction(appLog, f(next))
   }
@@ -35,11 +38,12 @@ case class LogAction[A](log: AppLog, next:A) extends AppAction[A]
 
 sealed trait EventStoreAction[A]
 case class SaveEvent[A](event: Event, next: A) extends AppAction[A] with EventStoreAction[A]
-case class ListEvents[A](entityId:Option[EntityId], pageSize:Int, pageNumber: Option[Long], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
-case class ListEventsByRange[A](id:EntityId, from: Option[OffsetDateTime], to:OffsetDateTime, onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
+case class ListEvents[A](entityId:Option[EntityId], systemName:Option[SystemName],pageSize:Int, pageNumber: Option[Long], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
+case class ListEventsByRange[A](id:EntityId, systemName: SystemName, from: Option[OffsetDateTime], to:OffsetDateTime, onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
 case class SaveSnapshot[A](snapshot: Snapshot, next: A) extends AppAction[A] with EventStoreAction[A]
-case class GetEventsCount[A](entityId: Option[EntityId], onResult:Long => A) extends AppAction[A] with EventStoreAction[A]
-case class GetLatestSnapshot[A](entityId: EntityId, time: OffsetDateTime, onResult:Option[Snapshot] => A) extends AppAction[A] with EventStoreAction[A]
+case class GetEventsCount[A](entityId: Option[EntityId], systemName:Option[SystemName], onResult:Long => A) extends AppAction[A] with EventStoreAction[A]
+
+case class GetLatestSnapshot[A](entityId: EntityId, systemName: SystemName, time: OffsetDateTime, onResult: Option[Snapshot] => A) extends AppAction[A] with EventStoreAction[A]
 
 
 object AppAction {
@@ -63,13 +67,17 @@ object AppAction {
 
 
 object EventStoreAction {
-  def getEventsCount(entityId: Option[EntityId]):Script[Long] = GetEventsCount(entityId, identity).lift
+  def getEventsCount(entityId: Option[EntityId], systemName:Option[SystemName]):Script[Long] =
+    GetEventsCount(entityId, systemName, identity).lift
   def saveEvent(event: Event): Script[Unit] = SaveEvent(event, ()).lift
-  def listEvents(entityId: Option[EntityId], pageSize:Int, pageNumber:Option[Long]): Script[List[Event]] = ListEvents(entityId, pageSize, pageNumber, identity).lift
-  def listEventsByRange(id: EntityId, from: MaybeTime, to: OffsetDateTime): Script[List[Event]] =
-    ListEventsByRange(id, from, to, identity).lift
+  def listEvents(entityId: Option[EntityId], systemName:Option[SystemName], pageSize:Int,
+                 pageNumber:Option[Long]): Script[List[Event]] = ListEvents(entityId, systemName, pageSize, pageNumber, identity).lift
+  def listEventsByRange(id: EntityId, systemName: SystemName, from: MaybeTime, to: OffsetDateTime): Script[List[Event]] =
+    ListEventsByRange(id, systemName, from, to, identity).lift
 
   def saveSnapshot(snapshot: Snapshot): Script[Unit] = SaveSnapshot(snapshot, ()).lift
-  def getLatestSnapshotBefore(id: EntityId, time:OffsetDateTime): Script[Option[Snapshot]] = GetLatestSnapshot(id, time, identity).lift
+
+  def getLatestSnapshotBefore(id: EntityId, systemName: SystemName, time: OffsetDateTime): Script[Option[Snapshot]] =
+    GetLatestSnapshot(id, systemName, time, identity).lift
 }
 

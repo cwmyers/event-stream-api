@@ -1,0 +1,8 @@
+{
+  "entityId": "abc",
+  "systemName": "customer",
+  "timestamp": "2001-01-03T13:00:00Z",
+  "body": {
+    "email": "millsy@millsfam.com"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "entityId": "abc",
+  "systemName": "customer",
+  "timestamp": "2001-01-01T12:00:00Z",
+  "body": {
+    "firstName": "Michael",
+    "address" : {
+      "street" : "3/92 Golden Lane",
+      "suburb": "Miami",
+      "state": "VIC",
+      "postCode": "3001"
+    }
+  }
+}

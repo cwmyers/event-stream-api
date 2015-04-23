@@ -9,11 +9,12 @@ import scalaz.Scalaz._
 
 object ListEventsService {
 
-  def getEvents(entityId: Option[EntityId], maybePageSize: Option[Int], pageNumber: Option[Long]): Script[LinkedResponse] = for {
+  def getEvents(entityId: Option[EntityId], systemName: Option[SystemName],
+                maybePageSize: Option[Int], pageNumber: Option[Long]): Script[LinkedResponse] = for {
     config <- AppAction.getConfig
     pageSize = maybePageSize.getOrElse(config.defaultPageSize)
-    events <- listEvents(entityId, pageSize, pageNumber)
-    totalCount <- getEventsCount(entityId)
+    events <- listEvents(entityId, systemName, pageSize, pageNumber)
+    totalCount <- getEventsCount(entityId, systemName)
     lastPage = Math.max((totalCount/pageSize)-1,0)
   } yield LinkedResponse(events, pageNumber, pageSize, createLinks(entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize))
 

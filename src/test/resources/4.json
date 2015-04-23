@@ -1,0 +1,12 @@
+{
+  "entityId": "abc",
+  "systemName": "product",
+  "timestamp": "2001-01-03T13:00:00Z",
+  "body": {
+    "product": {
+      "serviceType": "ADSL",
+      "plan" : "platinum",
+      "bandwidth": "1.5Mbps"
+    }
+  }
+}

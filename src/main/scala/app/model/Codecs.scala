@@ -19,6 +19,7 @@ object Codecs {
   implicit def EntityIdCodec: CodecJson[EntityId] = WrapperCodec(EntityId, _.id)
   implicit def SnapshotIdCodec: CodecJson[SnapshotId] = WrapperCodec(SnapshotId, _.id)
   implicit def UriCodec: CodecJson[URI] = WrapperCodec(URI, _.url)
+  implicit def SystemNameCodec: CodecJson[SystemName] = WrapperCodec(SystemName, _.name)
 
   implicit def WrapperCodec[A](decode: String => A, encode: A => String): CodecJson[A] =
     CodecJson.derived(
@@ -27,17 +28,22 @@ object Codecs {
 
 
   implicit def ReceivedEventCodec: CodecJson[ReceivedEvent] =
-    casecodec3(ReceivedEvent.apply, ReceivedEvent.unapply)("entityId", "timestamp", "body")
+    casecodec4(ReceivedEvent.apply, ReceivedEvent.unapply)("entityId", "systemName", "timestamp", "body")
 
   implicit def EventCodec: CodecJson[Event] =
-    casecodec5(Event.apply, Event.unapply)("id", "entityId", "createdTimestamp", "suppliedTimestamp", "body")
+    casecodec6(Event.apply, Event.unapply)("id", "entityId",
+      "systemName", "createdTimestamp", "suppliedTimestamp", "body")
 
-  implicit def SnapshotEncoder: EncodeJson[Snapshot] = jencode4L(Snapshot.unapply _ andThen (_.get))("id", "entityId", "timestamp", "body")
+  implicit def SnapshotEncoder: EncodeJson[Snapshot] =
+    jencode5L(Snapshot.unapply _ andThen (_.get))("id", "entityId", "systemName", "timestamp", "body")
 
-  implicit def LinksEncoder: EncodeJson[Links] = jencode4L(Links.unapply _ andThen (_.get))("self", "first", "next", "prev")
+  implicit def LinksEncoder: EncodeJson[Links] =
+    jencode4L(Links.unapply _ andThen (_.get))("self", "first", "next", "prev")
 
   implicit def LinkedResponseEncoder: EncodeJson[LinkedResponse] =
     jencode4L(LinkedResponse.unapply _ andThen (_.get))("events", "pageNumber", "pageSize", "_links")
+
+  implicit def EntityCodec: EncodeJson[Entity] = jencode3L(Entity.unapply _ andThen(_.get))("entityId", "body", "systemName")
 
 
 }
