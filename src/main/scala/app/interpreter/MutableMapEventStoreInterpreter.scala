@@ -8,7 +8,7 @@ import app.model.{Snapshot, Event}
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class TestEventStoreInterpreter(implicit ec: ExecutionContext) extends EventStoreInterpreter {
+class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext) extends EventStoreInterpreter {
   val mutableEventMap = mutable.Map[String, Event]()
   val mutableSnapshotMap = mutable.Map[String, Snapshot]()
 

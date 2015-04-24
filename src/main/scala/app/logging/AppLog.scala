@@ -2,8 +2,10 @@ package app.logging
 
 import java.time.OffsetDateTime
 
-import app.model.{Event, Snapshot}
-import argonaut.Json
+import app.model.{Entity, Event, Snapshot}
 
 sealed trait AppLog
-case class GetEntityLog(requestedTime: OffsetDateTime, snapshot: Option[Snapshot], events: List[Event], entity:Json) extends AppLog
+case class GetEntityLog(requestedTime: OffsetDateTime, snapshot: Option[Snapshot],
+                        events: List[Event], entity:Entity) extends AppLog
+case class SavedSnapshot(snapshot: Snapshot) extends AppLog
+case class SavedEvent(event: Event) extends AppLog

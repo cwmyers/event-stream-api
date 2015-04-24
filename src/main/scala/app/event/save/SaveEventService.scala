@@ -2,6 +2,7 @@ package app.event.save
 
 import app.action.AppAction._
 import app.action.EventStoreAction._
+import app.logging.SavedEvent
 import app.model.{Event, ReceivedEvent}
 
 object SaveEventService {
@@ -10,5 +11,6 @@ object SaveEventService {
     timestamp <- currentTime
     event = Event.fromReceivedEvent(receivedEvent)(id, timestamp)
     _ <- saveEvent(event)
+    _ <- log(SavedEvent(event))
   } yield event
 }

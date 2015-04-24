@@ -24,7 +24,7 @@ object Main extends AppServer {
 
   private val configInterpreter = () => Config(defaultPageSize = 10)
 
-  private val interpreter = new DispatchInterpreter(new TestEventStoreInterpreter,
+  private val interpreter = new DispatchInterpreter(new MutableMapEventStoreInterpreter,
     idGenerator, timeGenerator, configInterpreter, PrintlnLoggingInterpreter)
 
 

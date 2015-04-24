@@ -15,9 +15,10 @@ object GetEntityService {
       to = time.getOrElse(currentTime)
       snapshot <- getLatestSnapshotBefore(id, systemName, to)
       events <- listEventsByRange(id, systemName, snapshot.map(_.timestamp), to)
-      entity = replayEventsWithSnapshot(snapshot, events)
+      jsonBody = replayEventsWithSnapshot(snapshot, events)
+      entity = Entity(id, jsonBody, systemName)
       _ <- AppAction.log(GetEntityLog(to, snapshot, events, entity))
-    } yield Entity(id, entity, systemName)
+    } yield entity
   }
 
 }
