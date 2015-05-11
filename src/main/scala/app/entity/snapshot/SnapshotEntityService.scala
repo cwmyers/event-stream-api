@@ -2,21 +2,19 @@ package app.entity.snapshot
 
 import java.time.OffsetDateTime
 
-import app.action.AppAction.{generateSnapshotId, log, Script}
-import app.action.EventStoreAction.saveSnapshot
-import app.action.{AppAction, EventStoreAction}
+import app.action.AppAction.{Script, generateSnapshotId, log}
+import app.action.EventStoreAction.{listEventsByRange, saveSnapshot}
 import app.logging.SavedSnapshot
-import app.model.{SystemName, EntityId, Event, Snapshot}
+import app.model.Event.replayEvents
+import app.model.{EntityId, Snapshot, SystemName}
 
 object SnapshotEntityService {
-  def snapshot(entityId: EntityId, systemName: SystemName, time: OffsetDateTime):Script[Snapshot] =
+  def snapshot(entityId: EntityId, systemName: SystemName, time: OffsetDateTime): Script[Snapshot] =
     for {
-      current <- EventStoreAction.listEventsByRange(entityId, systemName, None, time) map Event.replayEvents
+      current <- listEventsByRange(entityId, systemName, None, time) map replayEvents
       id <- generateSnapshotId
-      s = Snapshot(id, entityId, systemName, time, current)
-      _ <- saveSnapshot(s)
-      _ <- log(SavedSnapshot(s))
-    } yield s
-
-
+      snapshot = Snapshot(id, entityId, systemName, time, current)
+      _ <- saveSnapshot(snapshot)
+      _ <- log(SavedSnapshot(snapshot))
+    } yield snapshot
 }
