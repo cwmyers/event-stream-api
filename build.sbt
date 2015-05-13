@@ -27,6 +27,8 @@ libraryDependencies ++= Seq(
   "commons-lang"                           %  "commons-lang"             % "2.6",
   "org.slf4j"                              %  "jul-to-slf4j"             % "1.7.7",
   "ch.qos.logback"                         %  "logback-classic"          % "1.1.2",
+  "com.typesafe.slick"                     %% "slick"                    % "2.1.0",
+  "postgresql"                             %  "postgresql"               % "9.1-901.jdbc4",
   "com.chuusai"                            %% "shapeless"                % "2.1.0",
   "org.specs2"                             %% "specs2"                   % "2.4.15" % "test"
 )
