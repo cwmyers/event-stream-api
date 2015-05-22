@@ -14,7 +14,4 @@ object AppRuntime {
 
   }
 
-  object IdentityResponse extends ResponseFunction[Any] {
-    override def apply[B <: Any](res: HttpResponse[B]): HttpResponse[B] = res
-  }
 }

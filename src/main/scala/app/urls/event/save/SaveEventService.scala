@@ -1,4 +1,4 @@
-package app.event.save
+package app.urls.event.save
 
 import app.action.AppAction._
 import app.action.EventStoreAction._

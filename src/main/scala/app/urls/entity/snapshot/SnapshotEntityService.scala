@@ -1,4 +1,4 @@
-package app.entity.snapshot
+package app.urls.entity.snapshot
 
 import java.time.OffsetDateTime
 

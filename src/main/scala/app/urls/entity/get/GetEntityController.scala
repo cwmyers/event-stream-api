@@ -1,4 +1,4 @@
-package app.entity.get
+package app.urls.entity.get
 
 import app.action.AppAction.Script
 import app.infrastructure._

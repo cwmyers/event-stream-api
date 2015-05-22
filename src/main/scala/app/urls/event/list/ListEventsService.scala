@@ -1,4 +1,4 @@
-package app.event.list
+package app.urls.event.list
 
 import app.action.AppAction.{Script, getConfig}
 import app.action.EventStoreAction.{getEventsCount, listEvents}

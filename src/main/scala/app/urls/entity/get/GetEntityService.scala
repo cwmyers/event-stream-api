@@ -1,4 +1,4 @@
-package app.entity.get
+package app.urls.entity.get
 
 import app.MaybeTime
 import app.action.AppAction.{currentTime, log}

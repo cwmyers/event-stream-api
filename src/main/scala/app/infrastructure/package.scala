@@ -5,9 +5,6 @@ import unfiltered.netty.ReceivedMessage
 
 package object infrastructure {
 
-
-
-
   type FrameworkResponse = unfiltered.response.ResponseFunction[HttpResponse]
   type FrameworkRequest = unfiltered.request.HttpRequest[ReceivedMessage]
 

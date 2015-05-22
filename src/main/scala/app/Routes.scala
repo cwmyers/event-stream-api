@@ -1,11 +1,10 @@
 package app
 
 import app.action.AppAction.Script
-import app.action.SaveSnapshot
-import app.entity.get.GetEntityController
-import app.entity.snapshot.SnapshotEntityController
-import app.event.list.ListEventsController
-import app.event.save.SaveEventController
+import app.urls.entity.get.GetEntityController
+import app.urls.entity.snapshot.SnapshotEntityController
+import app.urls.event.list.ListEventsController
+import app.urls.event.save.SaveEventController
 import app.infrastructure.{FrameworkResponse, FrameworkRequest}
 import app.model.{SystemName, EntityId}
 import unfiltered.request.{Seg, GET, POST, Path}
