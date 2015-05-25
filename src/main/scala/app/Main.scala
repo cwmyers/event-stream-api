@@ -23,12 +23,20 @@ object Main extends AppServer {
     () => UUID.randomUUID().toString
   private val timeGenerator: TimeInterpreter = () => OffsetDateTime.now()
   private val configInterpreter = () => Config(defaultPageSize = 10)
-  private val db = new SlickDatabase("events", "events",
-    "jdbc:postgresql://localhost/events", "org.postgresql.Driver")
+  
+  
+  // Choose either the Sql Interpreter or the Mutable Map interpreter
+  // and plug it into the dispatch interpreter
+  
+  //private val db = new SlickDatabase("events", "events",
+  //  "jdbc:postgresql://localhost/events", "org.postgresql.Driver")
 
-  private val sqlInterpreter = new SqlInterpreter(db)
-  Try(sqlInterpreter.createDDL())
-  private val interpreter = new DispatchInterpreter(sqlInterpreter,
+  //private val eventStoreInterpreter = new SqlInterpreter(db)
+  //Try(sqlInterpreter.createDDL())
+  
+  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
+  
+  private val interpreter = new DispatchInterpreter(eventStoreInterpreter,
     idGenerator, timeGenerator, configInterpreter, PrintlnLoggingInterpreter)
 
   val appRoutes = frameworkifyRoutes(Routes.appRoutes, interpreter)
