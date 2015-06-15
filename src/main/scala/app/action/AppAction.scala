@@ -12,23 +12,7 @@ import scalaz.Free._
 import scalaz._
 
 sealed trait AppAction[A] {
-  def map[B](f: A => B): AppAction[B] = this match {
-    case SaveEvent(event, next) => SaveEvent(event, f(next))
-    case ListEvents(entityId, systemName, pageSize, pageNumber, onResult) =>
-      ListEvents(entityId, systemName, pageSize, pageNumber, onResult andThen f)
-    case GenerateId(onResult) => GenerateId(onResult andThen f)
-    case CurrentTime(onResult) => CurrentTime(onResult andThen f)
-    case ListEventsByRange(id, systemName, from, to, onResult) =>
-      ListEventsByRange(id, systemName, from, to, onResult andThen f)
-    case SaveSnapshot(snapshot, next) => SaveSnapshot(snapshot, f(next))
-    case GetLatestSnapshot(entityId, systemName, time, onResult) =>
-      GetLatestSnapshot(entityId, systemName, time, onResult andThen f)
-    case GetEventsCount(entityId, systemName, onResult) => GetEventsCount(entityId, systemName, onResult andThen f)
-    case GetConfig(onResult) => GetConfig(onResult andThen f)
-    case LogAction(appLog, next) => LogAction(appLog, f(next))
-  }
-
-  def lift: Script[A] = liftF(this)
+  def lift: Script[A] = liftFC(this)
 }
 
 case class GenerateId[A](onResult: String => A) extends AppAction[A]
@@ -47,13 +31,13 @@ case class GetLatestSnapshot[A](entityId: EntityId, systemName: SystemName, time
 
 
 object AppAction {
-  type Script[A] = Free[AppAction, A]
+  type Script[A] = FreeC[AppAction, A]
 
-  implicit val appActionFunctor: Functor[AppAction] = new Functor[AppAction] {
-    override def map[A, B](fa: AppAction[A])(f: (A) => B): AppAction[B] = fa map f
-  }
+  implicit val MonadAppAction: Monad[Script] =
+    Free.freeMonad[({type λ[α] = Coyoneda[AppAction, α]})#λ]
 
-  def noAction[A](a: A): Script[A] = Free.pure(a)
+
+  def noAction[A](a: A): Script[A] = Monad[Script].pure(a)
   def generateId: Script[String] = GenerateId(identity).lift
   def generateEventId: Script[EventId] = generateId map EventId
   def generateSnapshotId: Script[SnapshotId] = generateId map SnapshotId

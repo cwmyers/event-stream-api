@@ -5,7 +5,7 @@ import app.action._
 import app.infrastructure.FrameworkResponse
 
 import scala.concurrent.{ExecutionContext, Future}
-import scalaz.{Monad, ~>}
+import scalaz.{Free, Monad, ~>}
 
 class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
                            idGenerator: IdGeneratorInterpreter,
@@ -29,7 +29,8 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
     }
   }
 
-  def run(appAction: Script[FrameworkResponse]): Future[FrameworkResponse] = appAction foldMap interpret
+  def run(appAction: Script[FrameworkResponse]): Future[FrameworkResponse] =
+    Free.runFC[AppAction, Future, FrameworkResponse](appAction)(interpret)
 
   implicit val futureMonadInstance = new Monad[Future] {
     override def bind[A, B](fa: Future[A])(f: (A) => Future[B]): Future[B] = fa flatMap f
