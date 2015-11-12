@@ -14,43 +14,42 @@ import scalaz._
 
 class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends EventStoreInterpreter {
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = eventStoreAction match {
-    case SaveEvent(event, next) => Future {
+    case SaveEvent(event) => Future {
       db.withSession {
         implicit session =>
           EventsTable.events += eventToFields(event)
       }
-      next
+      ()
     }
-    case GetEventsCount(entityId, systemName, onResult) => Future {
+    case GetEventsCount(entityId, systemName) => Future {
       db.withSession {
         implicit session =>
           val q = for {
             events <- EventsTable.events
           } yield events
 
-          val result = filterEntityAndSystemName(entityId, systemName)(q).length.run
-          onResult(result)
+          filterEntityAndSystemName(entityId, systemName)(q).length.run
       }
     }
-    case GetLatestSnapshot(entityId, systemName, time, onResult) => Future {
+    case GetLatestSnapshot(entityId, systemName, time) => Future {
       db.withSession {
         implicit session =>
-          onResult(SnapshotsTable.snapshots.filter(_.entityId === entityId.id)
+          SnapshotsTable.snapshots.filter(_.entityId === entityId.id)
             .filter(_.systemName === systemName.name)
             .filter(_.timestamp <= Timestamp.from(time.toInstant))
-            .sortBy(_.timestamp.desc).take(1).list.headOption.map((createSnapshot _).tupled))
+            .sortBy(_.timestamp.desc).take(1).list.headOption.map((createSnapshot _).tupled)
 
       }
     }
-    case ListEvents(entityId, systemName, pageSize, pageNumber, onResult) => Future {
+    case ListEvents(entityId, systemName, pageSize, pageNumber) => Future {
       db.withSession {
         implicit session =>
           val query = EventsTable.events.drop(~pageNumber).take(pageSize)
 
-          onResult(convert(filterEntityAndSystemName(entityId, systemName)(query).list))
+          convert(filterEntityAndSystemName(entityId, systemName)(query).list)
       }
     }
-    case ListEventsByRange(entityId, systemName, from, to, onResult) => Future {
+    case ListEventsByRange(entityId, systemName, from, to) => Future {
       db.withSession {
         implicit session =>
           val q = EventsTable.events
@@ -58,15 +57,15 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
             .filter(_.systemName === systemName.name)
             .filter(_.suppliedTimetamp <= fromOffsetDateTime(to))
           val q1 = from.fold(q)(f => q.filter(_.suppliedTimetamp >= fromOffsetDateTime(f)))
-          onResult(convert(q1.list))
+          convert(q1.list)
       }
     }
-    case SaveSnapshot(snapshot, next) => Future {
+    case SaveSnapshot(snapshot) => Future {
       db.withSession {
         implicit session =>
           SnapshotsTable.snapshots += snapshotToFields(snapshot)
       }
-      next
+      ()
     }
   }
 
@@ -75,7 +74,6 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
   }
 
   def convert[F[_] : Functor](events: F[EventsTable.Fields]) = events.map((createEvent _).tupled)
-
 
   private def filterEntityId(id: Option[EntityId])(q: Query[EventsTable, EventsTable.Fields, Seq]): Query[EventsTable, EventsTable.Fields, Seq] =
     id.fold(q)(id => q.filter(_.entityId === id.id))

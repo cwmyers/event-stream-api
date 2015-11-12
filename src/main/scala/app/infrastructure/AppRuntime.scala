@@ -5,7 +5,7 @@ import app.interpreter.AppInterpreter
 import unfiltered.netty.future.Plan.Intent
 import unfiltered.response.{HttpResponse, ResponseFunction}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future, ExecutionContext}
 
 object AppRuntime {
 

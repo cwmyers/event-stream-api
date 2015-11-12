@@ -15,53 +15,53 @@ sealed trait AppAction[A] {
   def lift: Script[A] = liftFC(this)
 }
 
-case class GenerateId[A](onResult: String => A) extends AppAction[A]
-case class CurrentTime[A](onResult: OffsetDateTime => A) extends AppAction[A]
-case class GetConfig[A](onResult: Config => A) extends AppAction[A]
-case class LogAction[A](log: AppLog, next:A) extends AppAction[A]
+case object GenerateId extends AppAction[String]
+case object CurrentTime extends AppAction[OffsetDateTime]
+case object GetConfig extends AppAction[Config]
+case class LogAction(log: AppLog) extends AppAction[Unit]
 
 sealed trait EventStoreAction[A]
-case class SaveEvent[A](event: Event, next: A) extends AppAction[A] with EventStoreAction[A]
-case class ListEvents[A](entityId:Option[EntityId], systemName:Option[SystemName],pageSize:Int, pageNumber: Option[Long], onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
-case class ListEventsByRange[A](id:EntityId, systemName: SystemName, from: Option[OffsetDateTime], to:OffsetDateTime, onResult: List[Event] => A) extends AppAction[A] with EventStoreAction[A]
-case class SaveSnapshot[A](snapshot: Snapshot, next: A) extends AppAction[A] with EventStoreAction[A]
-case class GetEventsCount[A](entityId: Option[EntityId], systemName:Option[SystemName], onResult:Long => A) extends AppAction[A] with EventStoreAction[A]
+case class SaveEvent(event: Event) extends AppAction[Unit] with EventStoreAction[Unit]
+case class ListEvents(entityId:Option[EntityId], systemName:Option[SystemName],pageSize:Int, pageNumber: Option[Long]) extends AppAction[List[Event]] with EventStoreAction[List[Event]]
+case class ListEventsByRange(id:EntityId, systemName: SystemName, from: Option[OffsetDateTime], to:OffsetDateTime) extends AppAction[List[Event]] with EventStoreAction[List[Event]]
+case class SaveSnapshot(snapshot: Snapshot) extends AppAction[Unit] with EventStoreAction[Unit]
+case class GetEventsCount(entityId: Option[EntityId], systemName:Option[SystemName]) extends AppAction[Long] with EventStoreAction[Long]
 
-case class GetLatestSnapshot[A](entityId: EntityId, systemName: SystemName, time: OffsetDateTime, onResult: Option[Snapshot] => A) extends AppAction[A] with EventStoreAction[A]
+case class GetLatestSnapshot(entityId: EntityId, systemName: SystemName, time: OffsetDateTime) extends AppAction[Option[Snapshot]] with EventStoreAction[Option[Snapshot]]
 
 
 object AppAction {
   type Script[A] = FreeC[AppAction, A]
-
+  type AppActionCoyo[A] = Coyoneda[AppAction,A]
+  
   implicit val MonadAppAction: Monad[Script] =
-    Free.freeMonad[({type λ[α] = Coyoneda[AppAction, α]})#λ]
-
+    Free.freeMonad[AppActionCoyo]
 
   def noAction[A](a: A): Script[A] = Monad[Script].pure(a)
-  def generateId: Script[String] = GenerateId(identity).lift
+  def generateId: Script[String] = GenerateId.lift
   def generateEventId: Script[EventId] = generateId map EventId
   def generateSnapshotId: Script[SnapshotId] = generateId map SnapshotId
 
-  def currentTime: Script[OffsetDateTime] = CurrentTime(identity).lift
+  def currentTime: Script[OffsetDateTime] = CurrentTime.lift
 
-  def getConfig: Script[Config] = GetConfig(identity).lift
+  def getConfig: Script[Config] = GetConfig.lift
 
-  def log(appLog: AppLog): Script[Unit] = LogAction(appLog, ()).lift
+  def log(appLog: AppLog): Script[Unit] = LogAction(appLog).lift
 }
 
 
 object EventStoreAction {
   def getEventsCount(entityId: Option[EntityId], systemName:Option[SystemName]):Script[Long] =
-    GetEventsCount(entityId, systemName, identity).lift
-  def saveEvent(event: Event): Script[Unit] = SaveEvent(event, ()).lift
+    GetEventsCount(entityId, systemName).lift
+  def saveEvent(event: Event): Script[Unit] = SaveEvent(event).lift
   def listEvents(entityId: Option[EntityId], systemName:Option[SystemName], pageSize:Int,
-                 pageNumber:Option[Long]): Script[List[Event]] = ListEvents(entityId, systemName, pageSize, pageNumber, identity).lift
+                 pageNumber:Option[Long]): Script[List[Event]] = ListEvents(entityId, systemName, pageSize, pageNumber).lift
   def listEventsByRange(id: EntityId, systemName: SystemName, from: MaybeTime, to: OffsetDateTime): Script[List[Event]] =
-    ListEventsByRange(id, systemName, from, to, identity).lift
+    ListEventsByRange(id, systemName, from, to).lift
 
-  def saveSnapshot(snapshot: Snapshot): Script[Unit] = SaveSnapshot(snapshot, ()).lift
+  def saveSnapshot(snapshot: Snapshot): Script[Unit] = SaveSnapshot(snapshot).lift
 
   def getLatestSnapshotBefore(id: EntityId, systemName: SystemName, time: OffsetDateTime): Script[Option[Snapshot]] =
-    GetLatestSnapshot(id, systemName, time, identity).lift
+    GetLatestSnapshot(id, systemName, time).lift
 }
 
