@@ -16,16 +16,16 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
 
   val interpret: AppAction ~> Future = new (AppAction ~> Future) {
     override def apply[A](fa: AppAction[A]): Future[A] = fa match {
-      case a:SaveEvent[A] => eventStoreInterpreter.run(a)
-      case a:ListEvents[A] => eventStoreInterpreter.run(a)
-      case a:ListEventsByRange[A] => eventStoreInterpreter.run(a)
-      case a:SaveSnapshot[A] => eventStoreInterpreter.run(a)
-      case a:GetEventsCount[A] => eventStoreInterpreter.run(a)
-      case a:GetLatestSnapshot[A] => eventStoreInterpreter.run(a)
-      case GenerateId(onResult) => Future(onResult(idGenerator()))
-      case CurrentTime(onResult) => Future(onResult(timeGenerator()))
-      case GetConfig(onResult) => Future(onResult(configInterpreter()))
-      case LogAction(log, next) => Future{loggingInterpreter.log(log); next}
+      case a:SaveEvent => eventStoreInterpreter.run(a)
+      case a:ListEvents => eventStoreInterpreter.run(a)
+      case a:ListEventsByRange => eventStoreInterpreter.run(a)
+      case a:SaveSnapshot => eventStoreInterpreter.run(a)
+      case a:GetEventsCount => eventStoreInterpreter.run(a)
+      case a:GetLatestSnapshot => eventStoreInterpreter.run(a)
+      case GenerateId => Future(idGenerator())
+      case CurrentTime => Future(timeGenerator())
+      case GetConfig => Future(configInterpreter())
+      case LogAction(log) => Future{loggingInterpreter.log(log)}
     }
   }
 

@@ -9,5 +9,4 @@ trait AppInterpreter {
 
   def run(appAction: Script[FrameworkResponse]): Future[FrameworkResponse]
 
-
 }
