@@ -46,7 +46,8 @@ You can use the in memory mutable map by default or you can configure a postgres
 ```
 
 and comment out:
-```
+
+```scala
     private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
 ```
 

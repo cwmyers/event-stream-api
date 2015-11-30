@@ -28,13 +28,13 @@ object Main extends AppServer {
   // Choose either the Sql Interpreter or the Mutable Map interpreter
   // and plug it into the dispatch interpreter
   
-  //private val db = new SlickDatabase("events", "events",
-  //  "jdbc:postgresql://localhost/events", "org.postgresql.Driver")
+  private val db = new SlickDatabase("events", "events",
+    "jdbc:postgresql://localhost/events", "org.postgresql.Driver")
 
-  //private val eventStoreInterpreter = new SqlInterpreter(db)
-  //Try(sqlInterpreter.createDDL())
+  private val eventStoreInterpreter = new SqlInterpreter(db)
+  Try(eventStoreInterpreter.createDDL())
   
-  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
+//  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
   
   private val interpreter = new DispatchInterpreter(eventStoreInterpreter,
     idGenerator, timeGenerator, configInterpreter, PrintlnLoggingInterpreter)

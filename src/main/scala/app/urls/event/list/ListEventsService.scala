@@ -3,7 +3,9 @@ package app.urls.event.list
 import app.action.AppAction.{Script, getConfig}
 import app.action.EventStoreAction.{getEventsCount, listEvents}
 import app.model._
+import scala.language.higherKinds
 
+import scalaz.Foldable
 import scalaz.Scalaz._
 
 object ListEventsService {
@@ -24,8 +26,8 @@ object ListEventsService {
     Links(link(currentPage), link(0), nextPage, prevPage)
   }
 
-  private def makeLink(entityId: Option[EntityId], pageSize: Int)(pageNumber: Long) = {
-    val entity = ~entityId.map(id => s"/${id.id}")
+  private def makeLink[F[_]: Foldable](entityId: F[EntityId], pageSize: Int)(pageNumber: Long) = {
+    val entity = entityId.foldMap(id => s"/${id.id}")
     URI(s"/events$entity?pageNumber=$pageNumber&pageSize=$pageSize")
   }
 

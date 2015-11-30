@@ -8,7 +8,7 @@ name := "event-stream-api"
 
 version := scala.util.Properties.envOrElse("APP_VERSION", "snapshot")
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.6"
 
 sbtVersion := "0.13.5"
 

@@ -31,11 +31,8 @@ case class GetLatestSnapshot(entityId: EntityId, systemName: SystemName, time: O
 
 
 object AppAction {
-  type Script[A] = FreeC[AppAction, A]
-  type AppActionCoyo[A] = Coyoneda[AppAction,A]
-  
-  implicit val MonadAppAction: Monad[Script] =
-    Free.freeMonad[AppActionCoyo]
+  type ScriptImpl[α] = Coyoneda[AppAction, α]
+  type Script[A] = Free[ScriptImpl, A]
 
   def noAction[A](a: A): Script[A] = Monad[Script].pure(a)
   def generateId: Script[String] = GenerateId.lift
