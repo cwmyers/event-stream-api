@@ -1,8 +1,4 @@
-import com.typesafe.sbt.SbtNativePackager.packageArchetype
-
 resolvers += "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
-
-packageArchetype.java_application
 
 name := "event-stream-api"
 
