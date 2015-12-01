@@ -1,7 +1,9 @@
 resolvers ++= Seq(
   Resolver.url("scalasbt", new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns),
-  "ibiblio" at "http://mirrors.ibiblio.org/pub/mirrors/maven2"
-)
+  "ibiblio" at "http://mirrors.ibiblio.org/pub/mirrors/maven2")
+
+resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.6.2")
 
