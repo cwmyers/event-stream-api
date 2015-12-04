@@ -8,7 +8,7 @@ scalaVersion := "2.11.6"
 
 sbtVersion := "0.13.5"
 
-scalacOptions ++= Seq("-Xfatal-warnings")
+scalacOptions ++= Seq("-Xfatal-warnings", "-feature")
 
 val unfilteredLibraryVersion = "0.8.4"
 
