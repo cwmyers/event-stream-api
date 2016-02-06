@@ -23,9 +23,9 @@ class DispatchInterpreter(eventStoreInterpreter: EventStoreInterpreter,
       case a:SaveSnapshot => eventStoreInterpreter.run(a)
       case a:GetEventsCount => eventStoreInterpreter.run(a)
       case a:GetLatestSnapshot => eventStoreInterpreter.run(a)
-      case GenerateId => Future(idGenerator())
-      case CurrentTime => Future(timeGenerator())
-      case GetConfig => Future(configInterpreter())
+      case GenerateId => Future.successful(idGenerator())
+      case CurrentTime => Future.successful(timeGenerator())
+      case GetConfig => Future.successful(configInterpreter())
       case LogAction(log) => Future{loggingInterpreter.log(log)}
     }
   }

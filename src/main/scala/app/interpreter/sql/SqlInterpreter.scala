@@ -5,12 +5,13 @@ import java.sql.Timestamp
 import app.action._
 import app.interpreter.EventStoreInterpreter
 import app.model.{EntityId, SystemName}
+import cats.Functor
+import cats.std.all._
+import cats.syntax.all._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
 import scala.slick.driver.PostgresDriver.simple._
-import scalaz.Scalaz._
-import scalaz._
 
 class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends EventStoreInterpreter {
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = eventStoreAction match {
@@ -21,7 +22,7 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
       }
       ()
     }
-    case GetEventsCount(entityId, systemName) => Future {
+    case GetEventsCount(entityId, systemName) => Future.successful {
       db.withSession {
         implicit session =>
           val q = for {
@@ -31,7 +32,7 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
           filterEntityAndSystemName(entityId, systemName)(q).length.run
       }
     }
-    case GetLatestSnapshot(entityId, systemName, time) => Future {
+    case GetLatestSnapshot(entityId, systemName, time) => Future.successful {
       db.withSession {
         implicit session =>
           SnapshotsTable.snapshots.filter(_.entityId === entityId.id)
@@ -41,15 +42,15 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
 
       }
     }
-    case ListEvents(entityId, systemName, pageSize, pageNumber) => Future {
+    case ListEvents(entityId, systemName, pageSize, pageNumber) => Future.successful {
       db.withSession {
         implicit session =>
-          val query = EventsTable.events.drop(~pageNumber).take(pageSize)
+          val query = EventsTable.events.drop(pageNumber.orEmpty).take(pageSize)
 
           convert(filterEntityAndSystemName(entityId, systemName)(query).list)
       }
     }
-    case ListEventsByRange(entityId, systemName, from, to) => Future {
+    case ListEventsByRange(entityId, systemName, from, to) => Future.successful {
       db.withSession {
         implicit session =>
           val q = EventsTable.events
@@ -60,7 +61,7 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
           convert(q1.list)
       }
     }
-    case SaveSnapshot(snapshot) => Future {
+    case SaveSnapshot(snapshot) => Future.successful {
       db.withSession {
         implicit session =>
           SnapshotsTable.snapshots += snapshotToFields(snapshot)
