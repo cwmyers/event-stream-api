@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
   "io.argonaut"                            %% "argonaut"                 % "6.1-M4",
   "io.argonaut"                            %% "argonaut-unfiltered"      % "6.0.4",
   "commons-lang"                           %  "commons-lang"             % "2.6",
-  "org.spire-math"                         %% "cats"                     % "0.3.0",
+  "org.typelevel"                          %% "cats"                     % "0.4.1",
   "org.slf4j"                              %  "jul-to-slf4j"             % "1.7.7",
   "ch.qos.logback"                         %  "logback-classic"          % "1.1.2",
   "com.typesafe.slick"                     %% "slick"                    % "2.1.0",
