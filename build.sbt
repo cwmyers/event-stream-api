@@ -4,7 +4,7 @@ name := "event-stream-api"
 
 version := scala.util.Properties.envOrElse("APP_VERSION", "snapshot")
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 sbtVersion := "0.13.5"
 
@@ -33,3 +33,7 @@ libraryDependencies ++= Seq(
 mainClass in Compile := Some("app.Main") //Used in Universal packageBin
 
 mainClass in (Compile, run) := Some("app.infrastructure.Dev") //Used from normal sbt
+
+enablePlugins(JavaServerAppPackaging, DockerPlugin)
+
+

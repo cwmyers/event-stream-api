@@ -31,10 +31,10 @@ object Main extends AppServer {
   private val db = new SlickDatabase("events", "events",
     "jdbc:postgresql://localhost/events", "org.postgresql.Driver")
 
-  private val eventStoreInterpreter = new SqlInterpreter(db)
-  Try(eventStoreInterpreter.createDDL())
+//  private val eventStoreInterpreter = new SqlInterpreter(db)
+//  Try(eventStoreInterpreter.createDDL())
   
-//  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
+  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
   
   private val interpreter = new DispatchInterpreter(eventStoreInterpreter,
     idGenerator, timeGenerator, configInterpreter, PrintlnLoggingInterpreter)
