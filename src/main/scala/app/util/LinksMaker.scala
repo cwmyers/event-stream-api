@@ -11,8 +11,8 @@ import cats.std.all._
 
 
 object LinksMaker {
-  def createLinks[F[_]: Foldable, U:Wrap](id: F[U], currentPage: Long, lastPage: Long, pageSize: Int): Links = {
-    val link = LinksMaker.makeLink("entity", id, pageSize) _
+  def createLinks[F[_]: Foldable, U:Wrap](endpointName:String,id: F[U], currentPage: Long, lastPage: Long, pageSize: Int): Links = {
+    val link = LinksMaker.makeLink(endpointName, id, pageSize) _
     val nextPage = if (currentPage == lastPage) None else link(currentPage + 1).some
     val prevPage = if (currentPage == 0) None else link(currentPage - 1).some
     Links(link(currentPage), link(0), nextPage, prevPage)

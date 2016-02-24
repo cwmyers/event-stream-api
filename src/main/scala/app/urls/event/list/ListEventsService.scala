@@ -18,10 +18,7 @@ object ListEventsService {
     events <- listEvents(entityId, systemName, pageSize, pageNumber)
     totalCount <- getEventsCount(entityId, systemName)
     lastPage = Math.max((totalCount / pageSize) - 1, 0)
-  } yield LinkedResponse(events, pageNumber, pageSize, createLinks(entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize))
-
-
-
-
+  } yield LinkedResponse(events, pageNumber, pageSize,
+    createLinks("entity", entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize))
 
 }
