@@ -2,9 +2,9 @@ package app.urls.event.list
 
 import app.action.AppAction.{Script, getConfig}
 import app.action.EventStoreAction.{getEventsCount, listEvents}
+import app.model.WrapDefaults._
 import app.model._
-import cats.Foldable
-import cats.syntax.all._
+import app.util.LinksMaker.createLinks
 import cats.std.all._
 
 import scala.language.higherKinds
@@ -20,16 +20,8 @@ object ListEventsService {
     lastPage = Math.max((totalCount / pageSize) - 1, 0)
   } yield LinkedResponse(events, pageNumber, pageSize, createLinks(entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize))
 
-  private def createLinks(entityId: Option[EntityId], currentPage: Long, lastPage: Long, pageSize: Int): Links = {
-    val link = makeLink(entityId, pageSize) _
-    val nextPage = if (currentPage == lastPage) None else link(currentPage + 1).some
-    val prevPage = if (currentPage == 0) None else link(currentPage - 1).some
-    Links(link(currentPage), link(0), nextPage, prevPage)
-  }
 
-  private def makeLink[F[_]: Foldable](entityId: F[EntityId], pageSize: Int)(pageNumber: Long) = {
-    val entity = entityId.foldMap(id => s"/${id.id}")
-    URI(s"/events$entity?pageNumber=$pageNumber&pageSize=$pageSize")
-  }
+
+
 
 }
