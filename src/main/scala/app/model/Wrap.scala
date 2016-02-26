@@ -1,9 +1,6 @@
 package app.model
 
-import simulacrum.typeclass
-import scala.language.implicitConversions
-
-@typeclass trait Wrap[A] {
-  def wrap(s:String): A
-  def unwrap(a:A): String
+trait Wrap[A, B] {
+  def wrap(b: B): A
+  def unwrap(a: A): B
 }

@@ -5,6 +5,8 @@ import java.time.OffsetDateTime
 import argonaut._, Argonaut._
 
 import scala.util.Try
+import scalaz._,Scalaz._
+
 import WrapDefaults._
 
 object Codecs {
@@ -15,10 +17,13 @@ object Codecs {
       "Unable to parse date, it must be in ISO8601 format")
   )
 
-  implicit def WrapperCodec[A: Wrap]: CodecJson[A] =
+  implicit def WrapperCodec[A:WrapString]: CodecJson[A] =
     CodecJson.derived(
-      EncodeJson(e => jString(implicitly[Wrap[A]].unwrap(e))),
-      DecodeJson(c => c.as[String](StringDecodeJson) map (s => implicitly[Wrap[A]].wrap(s))))
+      EncodeJson(e => jString(implicitly[WrapString[A]].unwrap(e))),
+      DecodeJson(c => c.as[String](StringDecodeJson) map (s => implicitly[WrapString[A]].wrap(s))))
+
+
+
 
   implicit def ReceivedEventCodec: CodecJson[ReceivedEvent] =
     casecodec4(ReceivedEvent.apply, ReceivedEvent.unapply)("entityId", "systemName", "timestamp", "body")
