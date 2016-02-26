@@ -12,7 +12,7 @@ scalacOptions ++= Seq("-Xfatal-warnings", "-feature")
 
 val unfilteredLibraryVersion = "0.8.4"
 
-resolvers += "gphat" at "https://raw.github.com/gphat/mvn-repo/master/releases/"
+resolvers += "cwmyers" at "https://raw.github.com/cwmyers/mvn-repo/master/releases/"
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "net.databinder"                         %% "unfiltered-directives"    % unfilteredLibraryVersion,
   "net.databinder"                         %% "unfiltered-filter"        % unfilteredLibraryVersion,
   "com.github.mpilquist"                   %% "simulacrum"               % "0.7.0",
+  "io.github.cwmyers"                      %% "wrap"                     % "0.0.1",
   "io.argonaut"                            %% "argonaut"                 % "6.1-M4",
   "io.argonaut"                            %% "argonaut-unfiltered"      % "6.0.4",
   "commons-lang"                           %  "commons-lang"             % "2.6",

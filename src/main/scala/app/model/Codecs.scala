@@ -3,11 +3,11 @@ package app.model
 import java.time.OffsetDateTime
 
 import argonaut._, Argonaut._
+import wrap.WrapString
+import wrap.auto._
+import cats.std.all._
 
 import scala.util.Try
-import scalaz._,Scalaz._
-
-import WrapDefaults._
 
 object Codecs {
 
@@ -21,8 +21,6 @@ object Codecs {
     CodecJson.derived(
       EncodeJson(e => jString(implicitly[WrapString[A]].unwrap(e))),
       DecodeJson(c => c.as[String](StringDecodeJson) map (s => implicitly[WrapString[A]].wrap(s))))
-
-
 
 
   implicit def ReceivedEventCodec: CodecJson[ReceivedEvent] =

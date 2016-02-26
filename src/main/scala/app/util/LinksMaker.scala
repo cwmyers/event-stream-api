@@ -1,7 +1,7 @@
 package app.util
 
-import app.model.WrapDefaults.WrapString
 import app.model.{Links, URI}
+import wrap.WrapString
 
 import scala.language.higherKinds
 import cats.Foldable
