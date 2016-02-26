@@ -7,12 +7,12 @@ import app.action.AppAction.Script
 import app.infrastructure.Config
 import app.logging.AppLog
 import app.model._
-
-import scalaz.Free._
-import scalaz._
+import cats.Monad
+import cats.free.Free.liftF
+import cats.free._
 
 sealed trait AppAction[A] {
-  def lift: Script[A] = liftFC(this)
+  def lift: Script[A] = liftF(this)
 }
 
 case object GenerateId extends AppAction[String]
@@ -31,8 +31,7 @@ case class GetLatestSnapshot(entityId: EntityId, systemName: SystemName, time: O
 
 
 object AppAction {
-  type ScriptImpl[α] = Coyoneda[AppAction, α]
-  type Script[A] = Free[ScriptImpl, A]
+  type Script[A] = Free[AppAction, A]
 
   def noAction[A](a: A): Script[A] = Monad[Script].pure(a)
   def generateId: Script[String] = GenerateId.lift

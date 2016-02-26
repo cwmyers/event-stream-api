@@ -3,10 +3,11 @@ package app.urls.event.list
 import app.action.AppAction.{Script, getConfig}
 import app.action.EventStoreAction.{getEventsCount, listEvents}
 import app.model._
-import scala.language.higherKinds
+import cats.Foldable
+import cats.syntax.all._
+import cats.std.all._
 
-import scalaz.Foldable
-import scalaz.Scalaz._
+import scala.language.higherKinds
 
 object ListEventsService {
 

@@ -1,12 +1,11 @@
 import java.time.OffsetDateTime
 
-import argonaut.Json
+import cats.data.Xor
 
 import scala.util.Try
-import scalaz.{Monoid, \/}
 
 package object app {
-  type ErrorOr[A] = AppError \/ A
+  type ErrorOr[A] = AppError Xor A
 
   type MaybeTime = Option[OffsetDateTime]
 

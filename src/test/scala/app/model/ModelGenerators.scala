@@ -5,7 +5,6 @@ import java.util.Date
 
 import argonaut._, Argonaut._
 import org.scalacheck.{Arbitrary, Gen}
-import scalaz._, Scalaz._
 
 object ModelGenerators {
 
