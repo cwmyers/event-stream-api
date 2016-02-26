@@ -14,10 +14,14 @@ val unfilteredLibraryVersion = "0.8.4"
 
 resolvers += "gphat" at "https://raw.github.com/gphat/mvn-repo/master/releases/"
 
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+
+
 libraryDependencies ++= Seq(
   "net.databinder"                         %% "unfiltered-netty-server"  % unfilteredLibraryVersion,
   "net.databinder"                         %% "unfiltered-directives"    % unfilteredLibraryVersion,
   "net.databinder"                         %% "unfiltered-filter"        % unfilteredLibraryVersion,
+  "com.github.mpilquist"                   %% "simulacrum"               % "0.7.0",
   "io.argonaut"                            %% "argonaut"                 % "6.1-M4",
   "io.argonaut"                            %% "argonaut-unfiltered"      % "6.0.4",
   "commons-lang"                           %  "commons-lang"             % "2.6",
@@ -26,7 +30,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback"                         %  "logback-classic"          % "1.1.2",
   "com.typesafe.slick"                     %% "slick"                    % "2.1.0",
   "postgresql"                             %  "postgresql"               % "9.1-901.jdbc4",
-  "com.chuusai"                            %% "shapeless"                % "2.1.0",
+  "com.chuusai"                            %% "shapeless"                % "2.2.5",
   "org.specs2"                             %% "specs2"                   % "2.4.15" % "test"
 )
 

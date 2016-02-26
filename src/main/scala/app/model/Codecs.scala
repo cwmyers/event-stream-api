@@ -2,10 +2,12 @@ package app.model
 
 import java.time.OffsetDateTime
 
-import argonaut.Argonaut._
-import argonaut.{CodecJson, DecodeJson, EncodeJson}
+import argonaut._, Argonaut._
 
 import scala.util.Try
+import scalaz._,Scalaz._
+
+import WrapDefaults._
 
 object Codecs {
 
@@ -15,16 +17,12 @@ object Codecs {
       "Unable to parse date, it must be in ISO8601 format")
   )
 
-  implicit def EventIdCodec: CodecJson[EventId] = WrapperCodec(EventId, _.id)
-  implicit def EntityIdCodec: CodecJson[EntityId] = WrapperCodec(EntityId, _.id)
-  implicit def SnapshotIdCodec: CodecJson[SnapshotId] = WrapperCodec(SnapshotId, _.id)
-  implicit def UriCodec: CodecJson[URI] = WrapperCodec(URI, _.url)
-  implicit def SystemNameCodec: CodecJson[SystemName] = WrapperCodec(SystemName, _.name)
-
-  implicit def WrapperCodec[A](decode: String => A, encode: A => String): CodecJson[A] =
+  implicit def WrapperCodec[A:WrapString]: CodecJson[A] =
     CodecJson.derived(
-      EncodeJson(e => jString(encode(e))),
-      DecodeJson(c => c.as[String] map decode))
+      EncodeJson(e => jString(implicitly[WrapString[A]].unwrap(e))),
+      DecodeJson(c => c.as[String](StringDecodeJson) map (s => implicitly[WrapString[A]].wrap(s))))
+
+
 
 
   implicit def ReceivedEventCodec: CodecJson[ReceivedEvent] =
@@ -43,7 +41,9 @@ object Codecs {
   implicit def LinkedResponseEncoder: EncodeJson[LinkedResponse] =
     jencode4L(LinkedResponse.unapply _ andThen (_.get))("events", "pageNumber", "pageSize", "_links")
 
-  implicit def EntityCodec: EncodeJson[Entity] = jencode3L(Entity.unapply _ andThen(_.get))("entityId", "body", "systemName")
+  implicit def StateEncoder: EncodeJson[State] = jencode2L(State.unapply _ andThen (_.get))("systemName", "body")
+
+  implicit def EntityCodec: EncodeJson[Entity] = jencode2L(Entity.unapply _ andThen (_.get))("entityId", "state")
 
 
 }

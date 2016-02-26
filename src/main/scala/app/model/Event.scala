@@ -9,7 +9,7 @@ case class EventId(id: String) extends AnyVal
 case class EntityId(id: String) extends AnyVal
 case class SystemName(name: String) extends AnyVal
 case class SnapshotId(id: String) extends AnyVal
-case class URI(url:String) extends AnyVal
+case class URI(url: String) extends AnyVal
 
 
 case class ReceivedEvent(entityId: EntityId, systemName: SystemName, timestamp: OffsetDateTime, body: Json)
@@ -19,7 +19,8 @@ case class Event(id: EventId, entityId: EntityId,
                  createdTimestamp: OffsetDateTime,
                  suppliedTimestamp: OffsetDateTime, body: Json)
 
-case class Entity(id: EntityId, state: Json, systemName: SystemName)
+case class State(systemName: SystemName, body: Json)
+case class Entity(id: EntityId, state: Set[State])
 
 case class Snapshot(id: SnapshotId, entityId: EntityId, systemName: SystemName,
                     timestamp: OffsetDateTime, body: Json)
