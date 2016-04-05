@@ -2,7 +2,7 @@ package app.model
 
 import java.time.OffsetDateTime
 
-import argonaut.Json
+import io.circe.Json
 
 
 case class EventId(id: String) extends AnyVal
@@ -39,9 +39,9 @@ object Event {
   def replayEvents(events: List[Event]) = replayJsonEvents(events.map(_.body))
 
   def replayEventsWithSnapshot(snapshot: Option[Snapshot], events: List[Event]): Json =
-    replayJsonEvents(snapshot.fold(Json())(_.body) :: events.map(_.body))
+    replayJsonEvents(snapshot.fold(Json.Null)(_.body) :: events.map(_.body))
 
   def replayJsonEvents(events:List[Json]): Json =
-    events.foldLeft(Json())(_ deepmerge _)
+    events.foldLeft(Json.Null)(_ deepMerge _)
 
 }
