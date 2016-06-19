@@ -3,14 +3,12 @@ package app.model
 import java.time.OffsetDateTime
 
 import cats.data.Xor
-import cats.std.all._
 import io.circe._
-import wrap.WrapString
-import wrap.auto._
-//import io.circe.generic.auto._
+
 import scala.util.Try
 
 object Codecs {
+  private def stringEncoder[A <: String]:Encoder[A] = Encoder.instance(Json.fromString)
 
   implicit def DateDecoder: Decoder[OffsetDateTime] =
     Decoder[String].emap(dateString =>
@@ -19,14 +17,21 @@ object Codecs {
 
   implicit def DateEncoder: Encoder[OffsetDateTime] = Encoder.instance(d => Json.fromString(d.toString))
 
-  //  implicit def WrapperCodec[A:WrapString]: CodecJson[A] =
-  //    CodecJson.derived(
-  //      EncodeJson(e => jString(implicitly[WrapString[A]].unwrap(e))),
-  //      DecodeJson(c => c.as[String](StringDecodeJson) map (s => implicitly[WrapString[A]].wrap(s))))
 
-  implicit def WrapStringDecoder[A: WrapString]: Decoder[A] = Decoder[String].map(implicitly[WrapString[A]].wrap)
+  implicit def SystemNameDecoder: Decoder[SystemName] = Decoder[String].map(SystemName)
+  implicit def SystemNameEncoder: Encoder[SystemName] = stringEncoder
 
-  implicit def WrapStringEncoder[A: WrapString]: Encoder[A] = Encoder.instance(a => Json.fromString(implicitly[WrapString[A]].unwrap(a)))
+  implicit def EventIdEncoder: Encoder[EventId] = stringEncoder
+  implicit def EventIdDecoder: Decoder[EventId] = Decoder[String].map(EventId)
+
+  implicit def EntityIdDecoder: Decoder[EntityId] = Decoder[String].map(EntityId)
+  implicit def EntityIdEncoder: Encoder[EntityId] = stringEncoder
+
+  implicit def SnapshotIdDecoder: Decoder[SnapshotId] = Decoder[String].map(SnapshotId)
+  implicit def SnapshotIdEncoder: Encoder[SnapshotId] = stringEncoder
+
+  implicit def URIDecoder: Decoder[URI] = Decoder[String].map(URI)
+  implicit def URIEncoder: Encoder[URI] = stringEncoder
 
   implicit def ReceivedEventEncoder: Encoder[ReceivedEvent] =
     Encoder.forProduct4("entityId", "systemName", "timestamp", "body")(ReceivedEvent.unapply _ andThen (_.get))

@@ -1,15 +1,11 @@
 package app.urls.event.save
 
 import app.action.AppAction._
-import app.infrastructure
+import app.infrastructure._
 import app.model.Codecs._
 import app.model.ReceivedEvent
-import infrastructure._
-import unfiltered.response.{BadRequest, Created, ResponseString}
-import io.circe._
-import io.circe.generic.auto._
 import io.circe.parser._
-import io.circe.syntax._
+import unfiltered.response.{BadRequest, Created}
 
 object SaveEventController {
 

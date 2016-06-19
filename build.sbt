@@ -8,19 +8,21 @@ scalaVersion := "2.11.8"
 
 sbtVersion := "0.13.11"
 
-scalacOptions ++= Seq("-Xfatal-warnings",
+scalacOptions ++= Seq(
+  "-Xfatal-warnings",
+  "-Ywarn-unused-import",
   "-Xlint",
   "-feature",
   "-deprecation",
   "-unchecked",
   "-feature",
   "-language:higherKinds"
-  //  "-Xlog-implicits"
+//    "-Xlog-implicits"
 )
 
 val unfilteredLibraryVersion = "0.8.4"
 
-val circeVersion = "0.4.0-RC1"
+val circeVersion = "0.4.1"
 
 resolvers += "cwmyers" at "https://raw.github.com/cwmyers/mvn-repo/master/releases/"
 

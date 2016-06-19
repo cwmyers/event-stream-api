@@ -3,7 +3,7 @@ package app.interpreter
 import java.time.OffsetDateTime
 
 import app.action._
-import app.model.{SystemName, EntityId, Snapshot, Event}
+import app.model._
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,11 +18,11 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext) extends Eve
 
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = Future {
     eventStoreAction match {
-      case SaveEvent(event) => mutableEventMap += (event.id.id -> event); ()
+      case SaveEvent(event) => mutableEventMap += (event.id -> event); ()
       case ListEvents(entityId, systemName, pageSize, pageNumber) => listEvents(entityId, systemName, pageSize, pageNumber)
       case ListEventsByRange(entityId, systemName, from, to) => listEventsByRange(entityId, systemName, from, to)
       case SaveSnapshot(snapshot) =>
-        mutableSnapshotMap += (snapshot.id.id -> snapshot)
+        mutableSnapshotMap += (snapshot.id -> snapshot)
         ()
       case GetLatestSnapshot(entityId, systemName, time) => getLatestSnapshot(entityId, systemName, time)
       case GetEventsCount(entityId, systemName) => getEventCount(entityId, systemName)
@@ -31,7 +31,7 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext) extends Eve
   }
 
   def getEventCount(entityId: Option[EntityId], systemName: Option[SystemName]) = {
-    val events = entityId.fold(mutableEventMap)(id => mutableEventMap.filter { case (key, event) => event.id.id == id.id })
+    val events = entityId.fold(mutableEventMap)(id => mutableEventMap.filter { case (key, event) => event.id == id })
     val filtered = systemName.fold(events)(name => events.filter { case (key, event) => event.systemName == name })
     filtered.size
   }
@@ -39,7 +39,7 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext) extends Eve
   def listEvents(entityId: Option[EntityId], systemName: Option[SystemName], pageSize: Int, pageNumber: Option[Long]): List[Event] = {
     val all: List[Event] = mutableEventMap.toList.map(_._2)
     val entityFiltered: List[Event] = entityId.fold(all)(id => all.filter(_.entityId == id))
-    val systemNameFiltered = systemName.fold(entityFiltered)(name => entityFiltered.filter(_.systemName.name == name.name))
+    val systemNameFiltered = systemName.fold(entityFiltered)(name => entityFiltered.filter(_.systemName == name))
     val sorted: List[Event] = systemNameFiltered.sortBy(_.suppliedTimestamp)
     pageNumber.fold(sorted.takeRight(pageSize)) { p =>
       val startIndex = p.toInt * pageSize
@@ -54,7 +54,7 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext) extends Eve
       case (eventId, event) => event.entityId == entityId &&
         from.fold(true)(f => event.suppliedTimestamp.isAfter(f)) &&
         event.suppliedTimestamp.isBefore(to) &&
-        event.systemName.name == systemName.name
+        event.systemName == systemName
     }
     eventsForEntity.toList.map(_._2).sortBy(_.suppliedTimestamp)
   }
@@ -62,8 +62,8 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext) extends Eve
   def getLatestSnapshot(entityId: EntityId, systemName: SystemName, time: OffsetDateTime) = {
 
     mutableSnapshotMap.filter {
-      case (id, snapshot) => snapshot.entityId.id == entityId.id &&
-        snapshot.systemName.name == systemName.name
+      case (id, snapshot) => snapshot.entityId == entityId &&
+        snapshot.systemName == systemName
     }.toList.map(_._2)
       .sortBy(_.timestamp)
       .reverse

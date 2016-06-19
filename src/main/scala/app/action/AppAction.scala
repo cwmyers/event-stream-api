@@ -22,7 +22,7 @@ case class LogAction(log: AppLog) extends AppAction[Unit]
 
 sealed trait EventStoreAction[A]
 case class SaveEvent(event: Event) extends AppAction[Unit] with EventStoreAction[Unit]
-case class ListEvents(entityId:Option[EntityId], systemName:Option[SystemName],pageSize:Int, pageNumber: Option[Long]) extends AppAction[List[Event]] with EventStoreAction[List[Event]]
+case class ListEvents(entityId:Option[EntityId], systemName:Option[SystemName], pageSize:Int, pageNumber: Option[Long]) extends AppAction[List[Event]] with EventStoreAction[List[Event]]
 case class ListEventsByRange(id:EntityId, systemName: SystemName, from: Option[OffsetDateTime], to:OffsetDateTime) extends AppAction[List[Event]] with EventStoreAction[List[Event]]
 case class SaveSnapshot(snapshot: Snapshot) extends AppAction[Unit] with EventStoreAction[Unit]
 case class GetEventsCount(entityId: Option[EntityId], systemName:Option[SystemName]) extends AppAction[Long] with EventStoreAction[Long]

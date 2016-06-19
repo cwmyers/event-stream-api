@@ -5,8 +5,6 @@ import app.action.EventStoreAction.{getEventsCount, listEvents}
 import app.model._
 import app.util.LinksMaker.createLinks
 import cats.std.all._
-import wrap.auto._
-import scala.language.higherKinds
 
 object ListEventsService {
 

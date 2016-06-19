@@ -5,11 +5,8 @@ import java.time.OffsetDateTime
 import io.circe.Json
 
 
-case class EventId(id: String) extends AnyVal
-case class EntityId(id: String) extends AnyVal
-case class SystemName(name: String) extends AnyVal
-case class SnapshotId(id: String) extends AnyVal
-case class URI(url: String) extends AnyVal
+//  case class SystemName(get: String) extends AnyVal
+
 
 
 case class ReceivedEvent(entityId: EntityId, systemName: SystemName, timestamp: OffsetDateTime, body: Json)

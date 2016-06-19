@@ -1,13 +1,11 @@
 package app.interpreter
 
 import java.sql.Timestamp
-import java.time.{ZoneOffset, OffsetDateTime}
+import java.time.{OffsetDateTime, ZoneOffset}
 
 import app.model._
 import io.circe._
-import io.circe.generic.auto._
 import io.circe.parser._
-import io.circe.syntax._
 
 package object sql {
   def fromTimestamp(ts: java.sql.Timestamp): OffsetDateTime = OffsetDateTime.ofInstant(ts.toInstant, ZoneOffset.UTC)
@@ -20,10 +18,10 @@ package object sql {
       SystemName(systemName), fromTimestamp(timestamp), parse(body).getOrElse(Json.Null))
 
   def snapshotToFields(snapshot: Snapshot): SnapshotsTable.Fields =
-    (snapshot.id.id, snapshot.entityId.id, snapshot.systemName.name, fromOffsetDateTime(snapshot.timestamp), snapshot.body.noSpaces)
+    (snapshot.id, snapshot.entityId, snapshot.systemName, fromOffsetDateTime(snapshot.timestamp), snapshot.body.noSpaces)
 
   def eventToFields(event: Event): EventsTable.Fields =
-    (event.id.id, event.entityId.id, event.systemName.name,
+    (event.id, event.entityId, event.systemName,
       fromOffsetDateTime(event.createdTimestamp), fromOffsetDateTime(event.suppliedTimestamp), event.body.noSpaces)
 
   def createEvent(id:String, entityId:String, systemName:String, createdTimestamp:Timestamp, suppliedTimestamp:Timestamp,body:String) =

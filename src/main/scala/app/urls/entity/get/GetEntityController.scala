@@ -5,12 +5,8 @@ import app.infrastructure._
 import app.model.Codecs._
 import app.model.{EntityId, SystemName}
 import app.{MaybeTime, parseTime}
-import unfiltered.response.{BadRequest, Ok}
 import cats.syntax.all._
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
+import unfiltered.response.{BadRequest, Ok}
 
 object GetEntityController {
 
