@@ -34,7 +34,6 @@ libraryDependencies ++= Seq(
   "net.databinder"                         %% "unfiltered-directives"    % unfilteredLibraryVersion,
   "net.databinder"                         %% "unfiltered-filter"        % unfilteredLibraryVersion,
   "com.github.mpilquist"                   %% "simulacrum"               % "0.7.0",
-  "io.github.cwmyers"                      %% "wrap"                     % "0.0.1",
   "commons-lang"                           %  "commons-lang"             % "2.6",
   "org.typelevel"                          %% "cats"                     % "0.4.1",
   "org.slf4j"                              %  "jul-to-slf4j"             % "1.7.7",

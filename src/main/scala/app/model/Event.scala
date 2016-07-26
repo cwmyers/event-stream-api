@@ -5,10 +5,6 @@ import java.time.OffsetDateTime
 import io.circe.Json
 
 
-//  case class SystemName(get: String) extends AnyVal
-
-
-
 case class ReceivedEvent(entityId: EntityId, systemName: SystemName, timestamp: OffsetDateTime, body: Json)
 
 case class Event(id: EventId, entityId: EntityId,
@@ -30,8 +26,8 @@ case class LinkedResponse(events: List[Event], pageNumber: Option[Long], pageSiz
 
 
 object Event {
-  def fromReceivedEvent(receivedEvent: ReceivedEvent) =
-    Event(_: EventId, receivedEvent.entityId, receivedEvent.systemName, _: OffsetDateTime, receivedEvent.timestamp, receivedEvent.body)
+  def fromReceivedEvent(receivedEvent: ReceivedEvent)(eventId: EventId, time: OffsetDateTime): Event =
+    Event(eventId, receivedEvent.entityId, receivedEvent.systemName, time, receivedEvent.timestamp, receivedEvent.body)
 
   def replayEvents(events: List[Event]) = replayJsonEvents(events.map(_.body))
 
