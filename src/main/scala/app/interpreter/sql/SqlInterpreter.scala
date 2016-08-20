@@ -13,7 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
 import scala.slick.driver.PostgresDriver.simple._
 
-class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends EventStoreInterpreter {
+class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
+    extends EventStoreInterpreter {
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = eventStoreAction match {
     case SaveEvent(event) =>
       Future {

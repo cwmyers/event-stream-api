@@ -28,7 +28,10 @@ case class ListEvents(entityId: Option[EntityId],
                       pageNumber: Option[Long])
     extends AppAction[List[Event]]
     with EventStoreAction[List[Event]]
-case class ListEventsByRange(id: EntityId, systemName: SystemName, from: Option[OffsetDateTime], to: OffsetDateTime)
+case class ListEventsByRange(id: EntityId,
+                             systemName: SystemName,
+                             from: Option[OffsetDateTime],
+                             to: OffsetDateTime)
     extends AppAction[List[Event]]
     with EventStoreAction[List[Event]]
 case class SaveSnapshot(snapshot: Snapshot) extends AppAction[Unit] with EventStoreAction[Unit]
@@ -72,6 +75,8 @@ object EventStoreAction {
 
   def saveSnapshot(snapshot: Snapshot): Script[Unit] = SaveSnapshot(snapshot).lift
 
-  def getLatestSnapshotBefore(id: EntityId, systemName: SystemName, time: OffsetDateTime): Script[Option[Snapshot]] =
+  def getLatestSnapshotBefore(id: EntityId,
+                              systemName: SystemName,
+                              time: OffsetDateTime): Script[Option[Snapshot]] =
     GetLatestSnapshot(id, systemName, time).lift
 }

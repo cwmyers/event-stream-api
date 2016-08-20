@@ -18,7 +18,8 @@ object Codecs {
           .leftMap(_ => "Unable to parse date, it must be in ISO8601 format")
     )
 
-  implicit def DateEncoder: Encoder[OffsetDateTime] = Encoder.instance(d => Json.fromString(d.toString))
+  implicit def DateEncoder: Encoder[OffsetDateTime] =
+    Encoder.instance(d => Json.fromString(d.toString))
 
   implicit def SystemNameDecoder: Decoder[SystemName] = Decoder[String].map(SystemName)
   implicit def SystemNameEncoder: Encoder[SystemName] = stringEncoder
@@ -36,27 +37,45 @@ object Codecs {
   implicit def URIEncoder: Encoder[URI] = stringEncoder
 
   implicit def ReceivedEventEncoder: Encoder[ReceivedEvent] =
-    Encoder.forProduct4("entityId", "systemName", "timestamp", "body")(ReceivedEvent.unapply _ andThen (_.get))
+    Encoder.forProduct4("entityId", "systemName", "timestamp", "body")(
+      ReceivedEvent.unapply _ andThen (_.get)
+    )
 
   implicit def ReceivedEventDecoder: Decoder[ReceivedEvent] =
     Decoder.forProduct4("entityId", "systemName", "timestamp", "body")(ReceivedEvent)
 
   implicit def EventDecoder: Decoder[Event] =
-    Decoder.forProduct6("id", "entityId", "systemName", "createdTimestamp", "suppliedTimestamp", "body")(Event.apply)
+    Decoder.forProduct6(
+      "id",
+      "entityId",
+      "systemName",
+      "createdTimestamp",
+      "suppliedTimestamp",
+      "body"
+    )(Event.apply)
 
   implicit def EventEncoder: Encoder[Event] =
-    Encoder.forProduct6("id", "entityId", "systemName", "createdTimestamp", "suppliedTimestamp", "body")(
-      Event.unapply _ andThen (_.get)
-    )
+    Encoder.forProduct6(
+      "id",
+      "entityId",
+      "systemName",
+      "createdTimestamp",
+      "suppliedTimestamp",
+      "body"
+    )(Event.unapply _ andThen (_.get))
 
   implicit def SnapshotEncoder: Encoder[Snapshot] =
-    Encoder.forProduct5("id", "entityId", "systemName", "timestamp", "body")(Snapshot.unapply _ andThen (_.get))
+    Encoder.forProduct5("id", "entityId", "systemName", "timestamp", "body")(
+      Snapshot.unapply _ andThen (_.get)
+    )
 
   implicit def LinksEncoder: Encoder[Links] =
     Encoder.forProduct4("self", "first", "next", "prev")(Links.unapply _ andThen (_.get))
 
   implicit def LinkedResponseEncoder: Encoder[LinkedResponse] =
-    Encoder.forProduct4("events", "pageNumber", "pageSize", "_links")(LinkedResponse.unapply _ andThen (_.get))
+    Encoder.forProduct4("events", "pageNumber", "pageSize", "_links")(
+      LinkedResponse.unapply _ andThen (_.get)
+    )
 
   implicit def StateEncoder: Encoder[State] =
     Encoder.forProduct2("systemName", "body")(State.unapply _ andThen (_.get))

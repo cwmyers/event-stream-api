@@ -4,7 +4,10 @@ import java.time.OffsetDateTime
 
 import io.circe.Json
 
-case class ReceivedEvent(entityId: EntityId, systemName: SystemName, timestamp: OffsetDateTime, body: Json)
+case class ReceivedEvent(entityId: EntityId,
+                         systemName: SystemName,
+                         timestamp: OffsetDateTime,
+                         body: Json)
 
 case class Event(id: EventId,
                  entityId: EntityId,
@@ -16,15 +19,33 @@ case class Event(id: EventId,
 case class State(systemName: SystemName, body: Json)
 case class Entity(id: EntityId, state: Set[State])
 
-case class Snapshot(id: SnapshotId, entityId: EntityId, systemName: SystemName, timestamp: OffsetDateTime, body: Json)
+case class Snapshot(id: SnapshotId,
+                    entityId: EntityId,
+                    systemName: SystemName,
+                    timestamp: OffsetDateTime,
+                    body: Json)
 
-case class Links(selfPageUrl: URI, firstPageUrl: URI, nextPageUrl: Option[URI], previousPageUrl: Option[URI])
+case class Links(selfPageUrl: URI,
+                 firstPageUrl: URI,
+                 nextPageUrl: Option[URI],
+                 previousPageUrl: Option[URI])
 
-case class LinkedResponse(events: List[Event], pageNumber: Option[Long], pageSize: Int, links: Links)
+case class LinkedResponse(events: List[Event],
+                          pageNumber: Option[Long],
+                          pageSize: Int,
+                          links: Links)
 
 object Event {
-  def fromReceivedEvent(receivedEvent: ReceivedEvent)(eventId: EventId, time: OffsetDateTime): Event =
-    Event(eventId, receivedEvent.entityId, receivedEvent.systemName, time, receivedEvent.timestamp, receivedEvent.body)
+  def fromReceivedEvent(receivedEvent: ReceivedEvent)(eventId: EventId,
+                                                      time: OffsetDateTime): Event =
+    Event(
+      eventId,
+      receivedEvent.entityId,
+      receivedEvent.systemName,
+      time,
+      receivedEvent.timestamp,
+      receivedEvent.body
+    )
 
   def replayEvents(events: List[Event]) = replayJsonEvents(events.map(_.body))
 

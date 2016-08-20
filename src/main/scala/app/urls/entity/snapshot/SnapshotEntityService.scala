@@ -9,7 +9,9 @@ import app.model.Event.replayEvents
 import app.model.{EntityId, Snapshot, SystemName}
 
 object SnapshotEntityService {
-  def snapshot(entityId: EntityId, systemName: SystemName, time: OffsetDateTime): Script[Snapshot] =
+  def snapshot(entityId: EntityId,
+               systemName: SystemName,
+               time: OffsetDateTime): Script[Snapshot] =
     for {
       current <- listEventsByRange(entityId, systemName, None, time) map replayEvents
       id <- generateSnapshotId

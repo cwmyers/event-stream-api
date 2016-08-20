@@ -20,7 +20,9 @@ object ListEventsController {
     val pageSize   = getFromRequest(request, "pageSize").flatMap(_.parseIntOption)
     val pageNumber = getFromRequest(request, "pageNumber").flatMap(_.parseLongOption)
     val systemName = getFromRequest(request, "systemName").map(SystemName)
-    ListEventsService.getEvents(entityId, systemName, pageSize, pageNumber) map (events => Ok ~> JsonResponse(events))
+    ListEventsService
+      .getEvents(entityId, systemName, pageSize, pageNumber)
+      .map(events => Ok ~> JsonResponse(events))
   }
 
   def getFromRequest(request: FrameworkRequest, param: String): Option[String] =

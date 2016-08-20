@@ -8,11 +8,16 @@ import io.circe._
 import io.circe.parser._
 
 package object sql {
-  def fromTimestamp(ts: java.sql.Timestamp): OffsetDateTime = OffsetDateTime.ofInstant(ts.toInstant, ZoneOffset.UTC)
+  def fromTimestamp(ts: java.sql.Timestamp): OffsetDateTime =
+    OffsetDateTime.ofInstant(ts.toInstant, ZoneOffset.UTC)
 
   def fromOffsetDateTime(date: OffsetDateTime) = Timestamp.from(date.toInstant)
 
-  def createSnapshot(id: String, entityId: String, systemName: String, timestamp: Timestamp, body: String): Snapshot =
+  def createSnapshot(id: String,
+                     entityId: String,
+                     systemName: String,
+                     timestamp: Timestamp,
+                     body: String): Snapshot =
     Snapshot(
       SnapshotId(id),
       EntityId(entityId),

@@ -19,7 +19,9 @@ object LinksMaker {
     Links(link(currentPage), link(0), nextPage, prevPage)
   }
 
-  def makeLink[F[_]: Foldable](endpoint: String, id: F[EntityId], pageSize: Int)(pageNumber: Long) = {
+  def makeLink[F[_]: Foldable](endpoint: String, id: F[EntityId], pageSize: Int)(
+    pageNumber: Long
+  ) = {
     val entity = id.foldMap { i =>
       i.toString
     }

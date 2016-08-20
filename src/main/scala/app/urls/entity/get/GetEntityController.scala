@@ -12,7 +12,12 @@ object GetEntityController {
 
   def get(id: EntityId, request: FrameworkRequest): Script[FrameworkResponse] = {
     val maybeSystemNames =
-      request.parameterValues("systemNames").toList.flatMap(_.split("\\s*,\\s*")).map(SystemName).toNel
+      request
+        .parameterValues("systemNames")
+        .toList
+        .flatMap(_.split("\\s*,\\s*"))
+        .map(SystemName)
+        .toNel
     val maybeTime: MaybeTime = request.parameterValues("at").headOption.flatMap(parseTime)
     maybeSystemNames.fold(noAction[FrameworkResponse](BadRequest))(
       systemNames =>
