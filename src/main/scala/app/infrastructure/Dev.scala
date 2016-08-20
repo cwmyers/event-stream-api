@@ -4,7 +4,7 @@ import app.Main
 
 object Dev {
 
-  def main(args: Array[String]):Unit = {
+  def main(args: Array[String]): Unit = {
     Main.main(args)
   }
 }

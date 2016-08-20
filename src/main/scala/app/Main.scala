@@ -17,27 +17,30 @@ import scala.concurrent.ExecutionContext
 
 object Main extends AppServer {
   implicit val executionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(40))
-  val port = 9090
+  val port                      = 9090
 
-  private val idGenerator: IdGeneratorInterpreter =
-    () => UUID.randomUUID().toString
-  private val timeGenerator: TimeInterpreter = () => OffsetDateTime.now()
-  private val configInterpreter = () => Config(defaultPageSize = 10)
-  
-  
+  private val idGenerator: IdGeneratorInterpreter = () => UUID.randomUUID().toString
+  private val timeGenerator: TimeInterpreter      = () => OffsetDateTime.now()
+  private val configInterpreter                   = () => Config(defaultPageSize = 10)
+
   // Choose either the Sql Interpreter or the Mutable Map interpreter
   // and plug it into the dispatch interpreter
-  
+
 //  private val db = new SlickDatabase("events", "events",
 //    "jdbc:postgresql://localhost/events", "org.postgresql.Driver")
 
 //  private val eventStoreInterpreter = new SqlInterpreter(db)
 //  Try(eventStoreInterpreter.createDDL())
-  
+
   private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
-  
-  private val interpreter = new DispatchInterpreter(eventStoreInterpreter,
-    idGenerator, timeGenerator, configInterpreter, PrintlnLoggingInterpreter)
+
+  private val interpreter = new DispatchInterpreter(
+    eventStoreInterpreter,
+    idGenerator,
+    timeGenerator,
+    configInterpreter,
+    PrintlnLoggingInterpreter
+  )
 
   val appRoutes = frameworkifyRoutes(Routes.appRoutes, interpreter)
 

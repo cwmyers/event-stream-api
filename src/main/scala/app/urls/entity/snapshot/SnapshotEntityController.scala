@@ -11,8 +11,10 @@ object SnapshotEntityController {
 
   def snapshot(id: EntityId, systemName: SystemName, time: String): Script[FrameworkResponse] = {
     val error = BadRequest ~> responseString("Time must be in ISO8601 format")
-    parseTime(time).fold(noAction[FrameworkResponse](error))(dateTime =>
-      SnapshotEntityService.snapshot(id, systemName, dateTime) map (snapshot => Created ~> JsonResponse(snapshot)))
+    parseTime(time).fold(noAction[FrameworkResponse](error))(
+      dateTime =>
+        SnapshotEntityService.snapshot(id, systemName, dateTime) map (snapshot => Created ~> JsonResponse(snapshot))
+    )
   }
 
 }

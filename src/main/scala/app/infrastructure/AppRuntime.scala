@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContext
 
 object AppRuntime {
 
-  def frameworkifyRoutes(appRoutes: AppRoutes, interpreter: AppInterpreter)(implicit ec:ExecutionContext): Intent = {
+  def frameworkifyRoutes(appRoutes: AppRoutes, interpreter: AppInterpreter)(implicit ec: ExecutionContext): Intent = {
     case req if appRoutes.isDefinedAt(req) => interpreter.run(appRoutes(req))
 
   }

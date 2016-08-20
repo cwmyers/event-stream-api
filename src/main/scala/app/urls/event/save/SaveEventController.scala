@@ -14,8 +14,10 @@ object SaveEventController {
     val maybeEvent = decode[ReceivedEvent](request.body)
 
     val saveEventAction = maybeEvent map SaveEventService.save
-    saveEventAction.fold[Script[FrameworkResponse]](error => noAction(BadRequest ~> responseString(error.getMessage)),
-      action => action.map(event => Created ~> JsonResponse(event)))
+    saveEventAction.fold[Script[FrameworkResponse]](
+      error => noAction(BadRequest ~> responseString(error.getMessage)),
+      action => action.map(event => Created ~> JsonResponse(event))
+    )
 
   }
 

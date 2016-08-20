@@ -1,0 +1,5 @@
+--style IntelliJ
+--maxColumn 120
+--binPackImportSelectors true
+--alignByOpenParenCallSite false
+--alignTokens =>;Case,=;Defn.(Va(l|r)|Def),->;Term.ApplyInfix,//;.*

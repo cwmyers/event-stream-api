@@ -20,7 +20,7 @@ object GetEntityService {
         events <- listEventsByRange(id, systemName, maybeSnapshot.map(_.timestamp), to)
         jsonBody = replayEventsWithSnapshot(maybeSnapshot, events)
         entityStateForSystem = State(systemName, jsonBody)
-      //        _ <- log(GetEntityLog(to, maybeSnapshot, events, entityStateForSystem))
+        //        _ <- log(GetEntityLog(to, maybeSnapshot, events, entityStateForSystem))
       } yield entityStateForSystem
     }
     val script: Script[NonEmptyList[State]] = allState.sequence

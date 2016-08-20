@@ -1,3 +1,5 @@
+import org.scalafmt.sbt.ScalaFmtPlugin.autoImport._
+
 resolvers += "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
 
 name := "event-stream-api"
@@ -51,3 +53,9 @@ libraryDependencies ++= Seq(
 mainClass in Compile := Some("app.Main") //Used in Universal packageBin
 
 mainClass in (Compile, run) := Some("app.infrastructure.Dev") //Used from normal sbt
+
+scalafmtConfig in ThisBuild := Some(file(".scalafmt"))
+
+compileInputs in (Compile, compile) <<=
+  (compileInputs in (Compile, compile)) dependsOn (scalafmt in Compile)
+
