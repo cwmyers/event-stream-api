@@ -22,5 +22,4 @@ class SnapshotsTable(tag: Tag) extends Table[SnapshotsTable.Fields](tag, "snapsh
 
   def * = (id, entityId, systemName, timestamp, body)
 
-
 }

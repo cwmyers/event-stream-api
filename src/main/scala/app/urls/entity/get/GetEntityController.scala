@@ -11,11 +11,13 @@ import unfiltered.response.{BadRequest, Ok}
 object GetEntityController {
 
   def get(id: EntityId, request: FrameworkRequest): Script[FrameworkResponse] = {
-    val maybeSystemNames = request.parameterValues("systemNames").toList.flatMap(_.split("\\s*,\\s*")).map(SystemName).toNel
+    val maybeSystemNames =
+      request.parameterValues("systemNames").toList.flatMap(_.split("\\s*,\\s*")).map(SystemName).toNel
     val maybeTime: MaybeTime = request.parameterValues("at").headOption.flatMap(parseTime)
-    maybeSystemNames.fold(noAction[FrameworkResponse](BadRequest))(systemNames =>
-    GetEntityService.getEntity(id, systemNames, maybeTime) map
-      (event => Ok ~> JsonResponse(event))
+    maybeSystemNames.fold(noAction[FrameworkResponse](BadRequest))(
+      systemNames =>
+        GetEntityService.getEntity(id, systemNames, maybeTime) map
+          (event => Ok ~> JsonResponse(event))
     )
   }
 

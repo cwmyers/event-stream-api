@@ -14,11 +14,9 @@ package object model {
   def EntityId(id: String): String @@ EntityIdT = tag[EntityIdT](id)
 
   type SnapshotId = String @@ SnapshotIdT
-  def SnapshotId(id:String): String @@ SnapshotIdT = tag[SnapshotIdT](id)
+  def SnapshotId(id: String): String @@ SnapshotIdT = tag[SnapshotIdT](id)
 
   type URI = String @@ URIT
   def URI(uri: String): String @@ URIT = tag[URIT](uri)
-
-
 
 }

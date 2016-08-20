@@ -8,14 +8,22 @@ import cats.std.all._
 
 object ListEventsService {
 
-  def getEvents(entityId: Option[EntityId], systemName: Option[SystemName],
-                maybePageSize: Option[Int], pageNumber: Option[Long]): Script[LinkedResponse] = for {
-    config <- getConfig
-    pageSize = maybePageSize.getOrElse(config.defaultPageSize)
-    events <- listEvents(entityId, systemName, pageSize, pageNumber)
-    totalCount <- getEventsCount(entityId, systemName)
-    lastPage = Math.max((totalCount / pageSize) - 1, 0)
-  } yield LinkedResponse(events, pageNumber, pageSize,
-    createLinks("entity", entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize))
+  def getEvents(entityId: Option[EntityId],
+                systemName: Option[SystemName],
+                maybePageSize: Option[Int],
+                pageNumber: Option[Long]): Script[LinkedResponse] =
+    for {
+      config <- getConfig
+      pageSize = maybePageSize.getOrElse(config.defaultPageSize)
+      events <- listEvents(entityId, systemName, pageSize, pageNumber)
+      totalCount <- getEventsCount(entityId, systemName)
+      lastPage = Math.max((totalCount / pageSize) - 1, 0)
+    } yield
+      LinkedResponse(
+        events,
+        pageNumber,
+        pageSize,
+        createLinks("entity", entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize)
+      )
 
 }

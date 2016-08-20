@@ -18,7 +18,7 @@ object ListEventsController {
     getEvents(request, entityId.some)
 
   def getEvents(request: FrameworkRequest, entityId: Option[EntityId]): Script[FrameworkResponse] = {
-    val pageSize = getFromRequest(request, "pageSize").flatMap(parseInt)
+    val pageSize   = getFromRequest(request, "pageSize").flatMap(parseInt)
     val pageNumber = getFromRequest(request, "pageNumber").flatMap(parseLong)
     val systemName = getFromRequest(request, "systemName").map(SystemName)
     ListEventsService.getEvents(entityId, systemName, pageSize, pageNumber) map (events => Ok ~> JsonResponse(events))
@@ -27,6 +27,6 @@ object ListEventsController {
   def getFromRequest(request: FrameworkRequest, param: String): Option[String] =
     request.parameterValues(param).headOption
 
-  def parseInt(s: String): Option[Int] = Xor.catchOnly[NumberFormatException](s.toInt).toOption
+  def parseInt(s: String): Option[Int]   = Xor.catchOnly[NumberFormatException](s.toInt).toOption
   def parseLong(s: String): Option[Long] = Xor.catchOnly[NumberFormatException](s.toLong).toOption
 }
