@@ -7,13 +7,13 @@ import java.util.concurrent.Executors
 import app.infrastructure.AppRuntime.frameworkifyRoutes
 import app.infrastructure.{Config, AppServer, NoRoute}
 import app.interpreter._
-import app.interpreter.sql.{SlickDatabase, SqlInterpreter}
+//import app.interpreter.sql.{SlickDatabase, SqlInterpreter}
 import unfiltered.netty.Server
 import unfiltered.netty.future.Plan.Intent
 import unfiltered.netty.future.Planify
 
 import scala.concurrent.ExecutionContext
-import scala.util.Try
+//import scala.util.Try
 
 object Main extends AppServer {
   implicit val executionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(40))

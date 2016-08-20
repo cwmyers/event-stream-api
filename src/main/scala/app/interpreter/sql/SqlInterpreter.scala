@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import app.action._
 import app.interpreter.EventStoreInterpreter
-import app.model.{EntityId, SystemName}
+import app.model.{SystemName, EntityId}
 import cats.Functor
 import cats.std.all._
 import cats.syntax.all._
@@ -35,8 +35,8 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
     case GetLatestSnapshot(entityId, systemName, time) => Future.successful {
       db.withSession {
         implicit session =>
-          SnapshotsTable.snapshots.filter(_.entityId === entityId.id)
-            .filter(_.systemName === systemName.name)
+          SnapshotsTable.snapshots.filter(_.entityId === entityId.toString)
+            .filter(_.systemName === systemName.toString)
             .filter(_.timestamp <= Timestamp.from(time.toInstant))
             .sortBy(_.timestamp.desc).take(1).list.headOption.map((createSnapshot _).tupled)
 
@@ -54,8 +54,8 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
       db.withSession {
         implicit session =>
           val q = EventsTable.events
-            .filter(_.entityId === entityId.id)
-            .filter(_.systemName === systemName.name)
+            .filter(_.entityId === entityId.toString)
+            .filter(_.systemName === systemName.toString)
             .filter(_.suppliedTimetamp <= fromOffsetDateTime(to))
           val q1 = from.fold(q)(f => q.filter(_.suppliedTimetamp >= fromOffsetDateTime(f)))
           convert(q1.list)
@@ -77,10 +77,10 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext) extends E
   def convert[F[_] : Functor](events: F[EventsTable.Fields]) = events.map((createEvent _).tupled)
 
   private def filterEntityId(id: Option[EntityId])(q: Query[EventsTable, EventsTable.Fields, Seq]): Query[EventsTable, EventsTable.Fields, Seq] =
-    id.fold(q)(id => q.filter(_.entityId === id.id))
+    id.fold(q)(id => q.filter(_.entityId === id.toString))
 
   private def filterSystemName(systemName: Option[SystemName])(q: Query[EventsTable, EventsTable.Fields, Seq]): Query[EventsTable, EventsTable.Fields, Seq] =
-    systemName.fold(q)(name => q.filter(_.systemName === name.name))
+    systemName.fold(q)(name => q.filter(_.systemName === name.toString))
 
   def createDDL() = {
     val ddl = EventsTable.events.ddl ++ SnapshotsTable.snapshots.ddl

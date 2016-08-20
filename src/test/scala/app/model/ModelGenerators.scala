@@ -3,7 +3,7 @@ package app.model
 import java.time.{OffsetDateTime, ZoneOffset}
 import java.util.Date
 
-import argonaut._, Argonaut._
+import io.circe.Json
 import org.scalacheck.{Arbitrary, Gen}
 
 object ModelGenerators {
@@ -22,7 +22,7 @@ object ModelGenerators {
     entityId <- genEntityId
     systemName <- genSystemName
     timestamp <- genTimestamp
-  } yield Snapshot(snapshotId, entityId, systemName, timestamp, Json())
+  } yield Snapshot(snapshotId, entityId, systemName, timestamp, Json.Null)
 
 
   private def minTime(t1: OffsetDateTime, t2: OffsetDateTime): OffsetDateTime =
@@ -40,7 +40,7 @@ object ModelGenerators {
     json <- genJson
   } yield Event(eventId, entityId, systemName, maxTime(time1, time2), minTime(time1, time2), json)
 
-  def genJString = Gen.alphaStr map jString
+  def genJString = Gen.alphaStr map Json.fromString
 
   def genJObject:Gen[Json] = for {
     str <- Gen.alphaStr.suchThat(!_.isEmpty)
@@ -48,12 +48,12 @@ object ModelGenerators {
   } yield Json.obj(str -> json)
 
   def genJArray: Gen[Json] =
-    Gen.listOf(genJString) map jArrayElements
+    Gen.listOf(genJString) map Json.fromValues
 
 
     def genJNumber:Gen[Json] = for {
       d <- Arbitrary.arbDouble.arbitrary
-    } yield jNumberOrNull(d)
+    } yield Json.fromDoubleOrNull(d)
 
   
   

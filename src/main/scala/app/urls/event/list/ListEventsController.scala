@@ -1,10 +1,9 @@
 package app.urls.event.list
 
 import app.action.AppAction.Script
-import app.infrastructure.{FrameworkRequest, FrameworkResponse}
+import app.infrastructure.{JsonResponse, FrameworkRequest, FrameworkResponse}
 import app.model.Codecs._
 import app.model.{SystemName, EntityId}
-import argonaut.integrate.unfiltered.JsonResponse
 import cats.data.Xor
 import unfiltered.response.Ok
 

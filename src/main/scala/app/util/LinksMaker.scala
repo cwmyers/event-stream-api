@@ -1,25 +1,24 @@
 package app.util
 
-import app.model.{Links, URI}
-import wrap.WrapString
+import app.model.{EntityId, Links, URI}
+import cats.Foldable
+import cats.std.all._
+import cats.syntax.all._
 
 import scala.language.higherKinds
-import cats.Foldable
-import cats.syntax.all._
-import cats.std.all._
 
 
 object LinksMaker {
-  def createLinks[F[_]: Foldable, U:WrapString](endpointName:String,id: F[U], currentPage: Long, lastPage: Long, pageSize: Int): Links = {
+  def createLinks[F[_]: Foldable](endpointName:String,id: F[EntityId], currentPage: Long, lastPage: Long, pageSize: Int): Links = {
     val link = makeLink(endpointName, id, pageSize) _
     val nextPage = if (currentPage == lastPage) None else link(currentPage + 1).some
     val prevPage = if (currentPage == 0) None else link(currentPage - 1).some
     Links(link(currentPage), link(0), nextPage, prevPage)
   }
 
-  def makeLink[F[_] : Foldable, U](endpoint: String, id: F[U], pageSize: Int)(pageNumber: Long)(implicit wrap:WrapString[U]) = {
+  def makeLink[F[_] : Foldable](endpoint: String, id: F[EntityId], pageSize: Int)(pageNumber: Long) = {
     val entity = id.foldMap { i =>
-      wrap.unwrap(i)
+      i.toString
     }
     URI(s"/$endpoint/$entity?pageNumber=$pageNumber&pageSize=$pageSize")
   }
