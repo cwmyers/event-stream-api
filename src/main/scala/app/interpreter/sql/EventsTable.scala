@@ -1,7 +1,8 @@
 package app.interpreter.sql
 
 import java.sql.Timestamp
-import scala.slick.driver.PostgresDriver.simple._
+//import MyPostgresDriver.api._
+import slick.driver.PostgresDriver.api._
 
 object EventsTable {
   type Fields = (String, String, String, Timestamp, Timestamp, String)
@@ -17,10 +18,10 @@ class EventsTable(tag: Tag) extends Table[EventsTable.Fields](tag, "events") {
 
   def createdTimestamp = column[Timestamp]("created_timestamp")
 
-  def suppliedTimetamp = column[Timestamp]("supplied_timestamp")
+  def suppliedTimestamp = column[Timestamp]("supplied_timestamp")
 
   def body = column[String]("body")
 
-  def * = (id, entityId, systemName, createdTimestamp, suppliedTimetamp, body)
+  def * = (id, entityId, systemName, createdTimestamp, suppliedTimestamp, body)
 
 }

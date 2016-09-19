@@ -2,7 +2,7 @@ package app.util
 
 import app.model.{EntityId, Links, URI}
 import cats.Foldable
-import cats.std.all._
+import cats.instances.all._
 import cats.syntax.all._
 
 import scala.language.higherKinds

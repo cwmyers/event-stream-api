@@ -6,7 +6,6 @@ import app.action.EventStoreAction._
 import app.model.Event.replayEventsWithSnapshot
 import app.model._
 import cats.data.NonEmptyList
-import cats.std.all._
 import cats.syntax.all._
 
 object GetEntityService {
@@ -25,7 +24,7 @@ object GetEntityService {
     }
     val script: Script[NonEmptyList[State]] = allState.sequence
 
-    script.map(l => Entity(id, l.unwrap.toSet))
+    script.map(l => Entity(id, l.toList.toSet))
   }
 
 }

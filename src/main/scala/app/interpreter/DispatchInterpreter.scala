@@ -3,7 +3,7 @@ package app.interpreter
 import app.action.AppAction.Script
 import app.action._
 import app.infrastructure.FrameworkResponse
-import cats.std.future._
+import cats.implicits._
 import cats.~>
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -4,7 +4,7 @@ import app.action.AppAction.{Script, getConfig}
 import app.action.EventStoreAction.{getEventsCount, listEvents}
 import app.model._
 import app.util.LinksMaker.createLinks
-import cats.std.all._
+import cats.instances.all._
 
 object ListEventsService {
 
