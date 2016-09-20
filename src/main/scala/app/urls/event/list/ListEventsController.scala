@@ -1,13 +1,12 @@
 package app.urls.event.list
 
 import app.action.AppAction.Script
-import app.infrastructure.{FrameworkRequest, FrameworkResponse}
+import app.infrastructure.{FrameworkRequest, FrameworkResponse, JsonResponse}
 import app.model.Codecs._
-import app.model.{SystemName, EntityId}
-import argonaut.integrate.unfiltered.JsonResponse
+import app.model.{EntityId, SystemName}
+import cats.syntax.all._
+import mouse.all._
 import unfiltered.response.Ok
-
-import scalaz.Scalaz._
 
 object ListEventsController {
 
@@ -18,12 +17,15 @@ object ListEventsController {
     getEvents(request, entityId.some)
 
   def getEvents(request: FrameworkRequest, entityId: Option[EntityId]): Script[FrameworkResponse] = {
-    val pageSize = getFromRequest(request, "pageSize").flatMap(_.parseInt.toOption)
-    val pageNumber = getFromRequest(request, "pageNumber").flatMap(_.parseLong.toOption)
+    val pageSize   = getFromRequest(request, "pageSize").flatMap(_.parseIntOption)
+    val pageNumber = getFromRequest(request, "pageNumber").flatMap(_.parseLongOption)
     val systemName = getFromRequest(request, "systemName").map(SystemName)
-    ListEventsService.getEvents(entityId, systemName, pageSize, pageNumber) map (events => Ok ~> JsonResponse(events))
+    ListEventsService
+      .getEvents(entityId, systemName, pageSize, pageNumber)
+      .map(events => Ok ~> JsonResponse(events))
   }
 
   def getFromRequest(request: FrameworkRequest, param: String): Option[String] =
     request.parameterValues(param).headOption
+
 }

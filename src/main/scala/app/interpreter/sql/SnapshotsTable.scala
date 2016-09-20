@@ -2,7 +2,8 @@ package app.interpreter.sql
 
 import java.sql.Timestamp
 
-import scala.slick.driver.PostgresDriver.simple._
+//import MyPostgresDriver.api._
+import slick.driver.PostgresDriver.api._
 
 object SnapshotsTable {
   type Fields = (String, String, String, Timestamp, String)
@@ -18,9 +19,8 @@ class SnapshotsTable(tag: Tag) extends Table[SnapshotsTable.Fields](tag, "snapsh
 
   def timestamp = column[Timestamp]("created_timestamp")
 
-  def body = column[String]("body")
+  def body = column[String]("body", O.SqlType("jsonb"))
 
   def * = (id, entityId, systemName, timestamp, body)
-
 
 }

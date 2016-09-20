@@ -1,0 +1,21 @@
+app:
+  image: event-stream-api:latest
+  environment:
+    DB_USER: events
+    DB_PASSWORD: events
+    DB_PATH: jdbc:postgresql://db/events
+  links:
+    - db
+  ports:
+    - "9090:9090"
+
+db:
+  image: postgres:9.5.2
+  container_name: event-stream-db
+  environment:
+    POSTGRES_USER: events
+    POSTGRES_PASSWORD: events
+  ports:
+      - "5432:5432"
+
+

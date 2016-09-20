@@ -1,24 +1,30 @@
 package app.urls.entity.get
 
 import app.MaybeTime
-import app.action.AppAction.{currentTime, log}
+import app.action.AppAction.{Script, currentTime}
 import app.action.EventStoreAction._
-import app.logging.GetEntityLog
 import app.model.Event.replayEventsWithSnapshot
-import app.model.{Entity, EntityId, SystemName}
+import app.model._
+import cats.data.NonEmptyList
+import cats.syntax.all._
 
 object GetEntityService {
 
-  def getEntity(id: EntityId, systemName: SystemName, time: MaybeTime) = {
-    for {
-      now <- currentTime
-      to = time.getOrElse(now)
-      maybeSnapshot <- getLatestSnapshotBefore(id, systemName, to)
-      events <- listEventsByRange(id, systemName, maybeSnapshot.map(_.timestamp), to)
-      jsonBody = replayEventsWithSnapshot(maybeSnapshot, events)
-      entity = Entity(id, jsonBody, systemName)
-      _ <- log(GetEntityLog(to, maybeSnapshot, events, entity))
-    } yield entity
+  def getEntity(id: EntityId, systemNames: NonEmptyList[SystemName], time: MaybeTime) = {
+    val allState: NonEmptyList[Script[State]] = systemNames.map { systemName =>
+      for {
+        now <- currentTime
+        to = time.getOrElse(now)
+        maybeSnapshot <- getLatestSnapshotBefore(id, systemName, to)
+        events <- listEventsByRange(id, systemName, maybeSnapshot.map(_.timestamp), to)
+        jsonBody = replayEventsWithSnapshot(maybeSnapshot, events)
+        entityStateForSystem = State(systemName, jsonBody)
+        //        _ <- log(GetEntityLog(to, maybeSnapshot, events, entityStateForSystem))
+      } yield entityStateForSystem
+    }
+    val script: Script[NonEmptyList[State]] = allState.sequence
+
+    script.map(l => Entity(id, l.toList.toSet))
   }
 
 }
