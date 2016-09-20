@@ -1,5 +1,5 @@
 dev:
-  image: java:latest
+  image: openjdk:latest
   working_dir: /app
   volumes:
     - ".:/app" # share current directory -> to /app folder in container
@@ -16,7 +16,7 @@ dev:
   command: ./sbt run
 
 devdb:
-  build: Dockerfile.db
+  image: postgres:9.5.2
   container_name: event-stream-db
   environment:
     POSTGRES_USER: events
