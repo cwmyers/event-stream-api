@@ -6,15 +6,13 @@ import app.action._
 import app.interpreter.EventStoreInterpreter
 import app.model.{EntityId, SystemName}
 import slick.dbio.Effect.Write
-//import slick.profile.FixedSqlAction
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.higherKinds
-//import MyPostgresDriver.api._
-import slick.driver.PostgresDriver.api._
-//import cats.instances.all._
+import MyPostgresDriver.api._
 import cats.implicits._
 import slick.dbio.{DBIOAction, Effect, NoStream}
+import scala.concurrent.duration._
 
 class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
     extends EventStoreInterpreter {
@@ -54,7 +52,7 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
       val q1 = from.fold(q)(f => q.filter(_.suppliedTimestamp >= fromOffsetDateTime(f)))
       executor(q1.result).map(l => convert(l.toList))
     case SaveSnapshot(snapshot) =>
-      executor((SnapshotsTable.snapshots += snapshotToFields(snapshot))).map(_ => ())
+      executor(SnapshotsTable.snapshots += snapshotToFields(snapshot)).map(_ => ())
 
   }
 
@@ -77,8 +75,7 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
 
   def createDDL() = {
     val ddl = EventsTable.events.schema ++ SnapshotsTable.snapshots.schema
-    ddl.create
-
+    Await.result(db.database.run(ddl.create), 10.seconds)
   }
 
   private def executor[R2, S2 <: NoStream, E2 <: Effect](a: DBIOAction[R2, S2, E2]) = {

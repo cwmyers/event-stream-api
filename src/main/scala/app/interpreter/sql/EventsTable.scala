@@ -1,11 +1,12 @@
 package app.interpreter.sql
 
 import java.sql.Timestamp
-//import MyPostgresDriver.api._
-import slick.driver.PostgresDriver.api._
+
+import MyPostgresDriver.api._
+import com.github.tminglei.slickpg.JsonString
 
 object EventsTable {
-  type Fields = (String, String, String, Timestamp, Timestamp, String)
+  type Fields = (String, String, String, Timestamp, Timestamp, JsonString)
   val events = TableQuery[EventsTable]
 }
 
@@ -20,7 +21,7 @@ class EventsTable(tag: Tag) extends Table[EventsTable.Fields](tag, "events") {
 
   def suppliedTimestamp = column[Timestamp]("supplied_timestamp")
 
-  def body = column[String]("body")
+  def body = column[JsonString]("body", O.SqlType("jsonb"))
 
   def * = (id, entityId, systemName, createdTimestamp, suppliedTimestamp, body)
 

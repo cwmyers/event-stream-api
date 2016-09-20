@@ -1,0 +1,27 @@
+dev:
+  image: java:latest
+  working_dir: /app
+  volumes:
+    - ".:/app" # share current directory -> to /app folder in container
+    - "~/.ivy2:/root/.ivy2"
+    - "~/.sbt:/root/.sbt"
+  environment:
+    DB_USER: events
+    DB_PASSWORD: events
+    DB_PATH: jdbc:postgresql://devdb/events
+  links:
+    - devdb
+  ports:
+    - "9090:9090"
+  command: ./sbt run
+
+devdb:
+  build: Dockerfile.db
+  container_name: event-stream-db
+  environment:
+    POSTGRES_USER: events
+    POSTGRES_PASSWORD: events
+  ports:
+      - "5432:5432"
+
+

@@ -19,7 +19,7 @@ class SnapshotsTable(tag: Tag) extends Table[SnapshotsTable.Fields](tag, "snapsh
 
   def timestamp = column[Timestamp]("created_timestamp")
 
-  def body = column[String]("body")
+  def body = column[String]("body", O.SqlType("jsonb"))
 
   def * = (id, entityId, systemName, timestamp, body)
 

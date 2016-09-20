@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import app.model._
+import com.github.tminglei.slickpg.JsonString
 import io.circe._
 import io.circe.parser._
 
@@ -39,20 +40,20 @@ package object sql {
      event.systemName,
      fromOffsetDateTime(event.createdTimestamp),
      fromOffsetDateTime(event.suppliedTimestamp),
-     event.body.noSpaces)
+     JsonString(event.body.noSpaces))
 
   def createEvent(id: String,
                   entityId: String,
                   systemName: String,
                   createdTimestamp: Timestamp,
                   suppliedTimestamp: Timestamp,
-                  body: String) =
+                  body: JsonString) =
     Event(
       EventId(id),
       EntityId(entityId),
       SystemName(systemName),
       fromTimestamp(createdTimestamp),
       fromTimestamp(suppliedTimestamp),
-      parse(body).getOrElse(Json.Null)
+      parse(body.value).getOrElse(Json.Null)
     )
 }
