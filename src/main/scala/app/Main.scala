@@ -27,8 +27,8 @@ object Main extends AppServer {
   // and plug it into the dispatch interpreter
 
   private val db = new SlickDatabase(
-    "events",
-    "events",
+    sys.env.getOrElse("DB_USER", "events"),
+    sys.env.getOrElse("DB_PASSWORD", "events"),
     sys.env.getOrElse("DB_PATH", "jdbc:postgresql://devdb/events"),
     "org.postgresql.Driver"
   )
@@ -36,7 +36,7 @@ object Main extends AppServer {
   private val eventStoreInterpreter = new SqlInterpreter(db)
   Try(eventStoreInterpreter.createDDL())
 
-//  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
+  //  private val eventStoreInterpreter = new MutableMapEventStoreInterpreter()
 
   private val interpreter = new DispatchInterpreter(
     eventStoreInterpreter,

@@ -63,4 +63,8 @@ compileInputs in (Compile, compile) <<=
 
 enablePlugins(JavaServerAppPackaging, DockerPlugin)
 
+dockerRepository := Some("cwmyers")
 
+dockerBaseImage := scala.util.Properties.envOrElse("DOCKER_IMAGE", "openjdk:latest")
+
+packageName in Docker := scala.util.Properties.envOrElse("DOCKER_PACKAGE_NAME", packageName.value)
