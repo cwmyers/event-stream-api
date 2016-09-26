@@ -23,7 +23,14 @@ object ListEventsService {
         events,
         pageNumber,
         pageSize,
-        createLinks("entity", entityId, pageNumber.getOrElse(lastPage), lastPage, pageSize)
+        createLinks(
+          "events",
+          entityId,
+          systemName,
+          pageNumber.getOrElse(lastPage),
+          lastPage,
+          pageSize
+        )
       )
 
 }

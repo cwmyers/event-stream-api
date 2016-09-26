@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "com.github.mpilquist"                   %% "simulacrum"               % "0.7.0",
   "commons-lang"                           %  "commons-lang"             % "2.6",
   "org.typelevel"                          %% "cats"                     % "0.7.2",
-  "com.github.benhutchison"                %% "mouse"                    % "0.4",
+  "com.github.benhutchison"                %% "mouse"                    % "0.5",
   "org.slf4j"                              %  "jul-to-slf4j"             % "1.7.7",
   "ch.qos.logback"                         %  "logback-classic"          % "1.1.2",
   "com.typesafe.slick"                     %% "slick"                    % "3.1.1",
