@@ -21,12 +21,8 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
     case SaveEvent(event) =>
       executor[Int, NoStream, Write](EventsTable.events += eventToFields(event)).map(_ => ())
     case GetEventsCount(entityId, systemName) =>
-      val q = for {
-        events <- EventsTable.events
-      } yield events
-
       db.database
-        .run(filterEntityAndSystemName(entityId, systemName)(q).length.result)
+        .run(filterEntityAndSystemName(entityId, systemName)(EventsTable.events).length.result)
         .map(_.toLong)
     case GetLatestSnapshot(entityId, systemName, time) =>
       val snaps = SnapshotsTable.snapshots
@@ -40,10 +36,12 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
       run1.map(_.headOption.map((createSnapshot _).tupled))
 
     case ListEvents(entityId, systemName, pageSize, pageNumber) =>
-      val query = EventsTable.events.drop(pageNumber.getOrElse(0L)).take(pageSize)
+      val query = filterEntityAndSystemName(entityId, systemName)(EventsTable.events)
+        .sortBy(_.suppliedTimestamp.desc)
+        .drop(pageNumber.getOrElse(0L) * pageSize)
+        .take(pageSize)
 
-      executor(filterEntityAndSystemName(entityId, systemName)(query).result)
-        .map(l => convert(l.toList))
+      executor(query.result).map(l => convert(l.toList))
     case ListEventsByRange(entityId, systemName, from, to) =>
       val q = EventsTable.events
         .filter(_.entityId === entityId.toString)
