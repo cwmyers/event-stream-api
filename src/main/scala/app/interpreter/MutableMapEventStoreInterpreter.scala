@@ -2,6 +2,7 @@ package app.interpreter
 
 import java.time.OffsetDateTime
 
+import app.MaybeTime
 import app.action._
 import app.model._
 
@@ -20,8 +21,8 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext)
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = Future {
     eventStoreAction match {
       case SaveEvent(event) => mutableEventMap += (event.id -> event); ()
-      case ListEvents(entityId, systemName, pageSize, pageNumber) =>
-        listEvents(entityId, systemName, pageSize, pageNumber)
+      case ListEvents(entityId, systemName, fromTime, toTime, pageSize, pageNumber) =>
+        listEvents(entityId, systemName, fromTime, toTime, pageSize, pageNumber)
       case ListEventsByRange(entityId, systemName, from, to) =>
         listEventsByRange(entityId, systemName, from, to)
       case SaveSnapshot(snapshot) =>
@@ -29,12 +30,16 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext)
         ()
       case GetLatestSnapshot(entityId, systemName, time) =>
         getLatestSnapshot(entityId, systemName, time)
-      case GetEventsCount(entityId, systemName) => getEventCount(entityId, systemName)
+      case GetEventsCount(entityId, systemName, fromTime, toTime) =>
+        getEventCount(entityId, systemName, fromTime, toTime)
 
     }
   }
 
-  def getEventCount(entityId: Option[EntityId], systemName: Option[SystemName]) = {
+  def getEventCount(entityId: Option[EntityId],
+                    systemName: Option[SystemName],
+                    fromTime: MaybeTime,
+                    toTime: MaybeTime) = {
     val events = entityId.fold(mutableEventMap)(
       id => mutableEventMap.filter { case (key, event) => event.id == id }
     )
@@ -46,6 +51,8 @@ class MutableMapEventStoreInterpreter(implicit ec: ExecutionContext)
 
   def listEvents(entityId: Option[EntityId],
                  systemName: Option[SystemName],
+                 fromTime: MaybeTime,
+                 toTime: MaybeTime,
                  pageSize: Int,
                  pageNumber: Option[Long]): List[Event] = {
     val all: List[Event]            = mutableEventMap.toList.map(_._2)

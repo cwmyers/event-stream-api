@@ -1,6 +1,7 @@
 package app.interpreter.sql
 
 import java.sql.Timestamp
+import java.time.OffsetDateTime
 
 import app.action._
 import app.interpreter.EventStoreInterpreter
@@ -10,19 +11,25 @@ import slick.dbio.Effect.Write
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.higherKinds
 import MyPostgresDriver.api._
+import app.MaybeTime
 import cats.implicits._
 import slick.dbio.{DBIOAction, Effect, NoStream}
+
 import scala.concurrent.duration._
 
 class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
     extends EventStoreInterpreter {
 
+  type EventQuery = Query[EventsTable, EventsTable.Fields, Seq]
+
   override def run[A](eventStoreAction: EventStoreAction[A]): Future[A] = eventStoreAction match {
     case SaveEvent(event) =>
       executor[Int, NoStream, Write](EventsTable.events += eventToFields(event)).map(_ => ())
-    case GetEventsCount(entityId, systemName) =>
+    case GetEventsCount(entityId, systemName, fromTime, toTime) =>
       db.database
-        .run(filterEntityAndSystemName(entityId, systemName)(EventsTable.events).length.result)
+        .run(
+          filterOptionals(entityId, systemName, fromTime, toTime)(EventsTable.events).length.result
+        )
         .map(_.toLong)
     case GetLatestSnapshot(entityId, systemName, time) =>
       val snaps = SnapshotsTable.snapshots
@@ -32,14 +39,14 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
         .sortBy(_.timestamp.desc)
         .take(1)
         .result
-      val run1: Future[Seq[(String, String, String, Timestamp, String)]] = db.database.run(snaps)
-      run1.map(_.headOption.map((createSnapshot _).tupled))
+      db.database.run(snaps).map(_.headOption.map((createSnapshot _).tupled))
 
-    case ListEvents(entityId, systemName, pageSize, pageNumber) =>
-      val query = filterEntityAndSystemName(entityId, systemName)(EventsTable.events)
-        .sortBy(_.suppliedTimestamp.desc)
-        .drop(pageNumber.getOrElse(0L) * pageSize)
-        .take(pageSize)
+    case ListEvents(entityId, systemName, fromTime, toTime, pageSize, pageNumber) =>
+      val query =
+        filterOptionals(entityId, systemName, fromTime, toTime)(EventsTable.events)
+          .sortBy(_.suppliedTimestamp.desc)
+          .drop(pageNumber.getOrElse(0L) * pageSize)
+          .take(pageSize)
 
       executor(query.result).map(l => convert(l.toList))
     case ListEventsByRange(entityId, systemName, from, to) =>
@@ -54,22 +61,32 @@ class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
 
   }
 
-  def filterEntityAndSystemName(entityId: Option[EntityId], systemName: Option[SystemName]) = {
-    filterEntityId(entityId) _ andThen filterSystemName(systemName)
+  def filterOptionals(entityId: Option[EntityId],
+                      systemName: Option[SystemName],
+                      fromTime: MaybeTime,
+                      toTime: MaybeTime) = {
+    filterEntityId(entityId) andThen filterSystemName(systemName) andThen filterMaybe[
+      OffsetDateTime
+    ](fromTime, (t, e) => e.suppliedTimestamp >= Timestamp.from(t.toInstant)) andThen
+      filterMaybe[OffsetDateTime](
+        toTime,
+        (t, e) => e.suppliedTimestamp <= Timestamp.from(t.toInstant)
+      )
   }
 
   def convert[F[_]: cats.Functor](events: F[EventsTable.Fields]) =
     events.map((createEvent _).tupled)
 
-  private def filterEntityId(
-    id: Option[EntityId]
-  )(q: Query[EventsTable, EventsTable.Fields, Seq]): Query[EventsTable, EventsTable.Fields, Seq] =
-    id.fold(q)(id => q.filter(_.entityId === id.toString))
+  private def filterEntityId(id: Option[EntityId]): EventQuery => EventQuery = {
+    filterMaybe[EntityId](id, (a, e) => e.entityId === a.toString)
+  }
 
-  private def filterSystemName(
-    systemName: Option[SystemName]
-  )(q: Query[EventsTable, EventsTable.Fields, Seq]): Query[EventsTable, EventsTable.Fields, Seq] =
-    systemName.fold(q)(name => q.filter(_.systemName === name.toString))
+  private def filterSystemName(systemName: Option[SystemName]): EventQuery => EventQuery =
+    filterMaybe[SystemName](systemName, (name, events) => events.systemName === name.toString)
+
+  private def filterMaybe[A](maybe: Option[A], f: (A, EventsTable) => Rep[Boolean])(
+    q: EventQuery
+  ): EventQuery = maybe.fold(q)(a => q.filter(f(a, _)))
 
   def createDDL() = {
     val ddl = EventsTable.events.schema ++ SnapshotsTable.snapshots.schema

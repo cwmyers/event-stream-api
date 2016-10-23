@@ -24,6 +24,8 @@ sealed trait EventStoreAction[A]
 case class SaveEvent(event: Event) extends AppAction[Unit] with EventStoreAction[Unit]
 case class ListEvents(entityId: Option[EntityId],
                       systemName: Option[SystemName],
+                      fromTime: MaybeTime,
+                      toTime: MaybeTime,
                       pageSize: Int,
                       pageNumber: Option[Long])
     extends AppAction[List[Event]]
@@ -35,7 +37,10 @@ case class ListEventsByRange(id: EntityId,
     extends AppAction[List[Event]]
     with EventStoreAction[List[Event]]
 case class SaveSnapshot(snapshot: Snapshot) extends AppAction[Unit] with EventStoreAction[Unit]
-case class GetEventsCount(entityId: Option[EntityId], systemName: Option[SystemName])
+case class GetEventsCount(entityId: Option[EntityId],
+                          systemName: Option[SystemName],
+                          fromTime: MaybeTime,
+                          toTime: MaybeTime)
     extends AppAction[Long]
     with EventStoreAction[Long]
 
@@ -59,14 +64,19 @@ object AppAction {
 }
 
 object EventStoreAction {
-  def getEventsCount(entityId: Option[EntityId], systemName: Option[SystemName]): Script[Long] =
-    GetEventsCount(entityId, systemName).lift
+  def getEventsCount(entityId: Option[EntityId],
+                     systemName: Option[SystemName],
+                     fromTime: MaybeTime,
+                     toTime: MaybeTime): Script[Long] =
+    GetEventsCount(entityId, systemName, fromTime, toTime).lift
   def saveEvent(event: Event): Script[Unit] = SaveEvent(event).lift
   def listEvents(entityId: Option[EntityId],
                  systemName: Option[SystemName],
+                 fromTime: MaybeTime,
+                 toTime: MaybeTime,
                  pageSize: Int,
                  pageNumber: Option[Long]): Script[List[Event]] =
-    ListEvents(entityId, systemName, pageSize, pageNumber).lift
+    ListEvents(entityId, systemName, fromTime, toTime, pageSize, pageNumber).lift
   def listEventsByRange(id: EntityId,
                         systemName: SystemName,
                         from: MaybeTime,

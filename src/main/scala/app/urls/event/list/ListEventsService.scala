@@ -1,5 +1,6 @@
 package app.urls.event.list
 
+import app.MaybeTime
 import app.action.AppAction.{Script, getConfig}
 import app.action.EventStoreAction.{getEventsCount, listEvents}
 import app.model._
@@ -10,13 +11,15 @@ object ListEventsService {
 
   def getEvents(entityId: Option[EntityId],
                 systemName: Option[SystemName],
+                fromTime: MaybeTime,
+                toTime: MaybeTime,
                 maybePageSize: Option[Int],
                 pageNumber: Option[Long]): Script[LinkedResponse] =
     for {
       config <- getConfig
       pageSize = maybePageSize.getOrElse(config.defaultPageSize)
-      events <- listEvents(entityId, systemName, pageSize, pageNumber)
-      totalCount <- getEventsCount(entityId, systemName)
+      events <- listEvents(entityId, systemName, fromTime, toTime, pageSize, pageNumber)
+      totalCount <- getEventsCount(entityId, systemName, fromTime, toTime)
       lastPage = Math.max((totalCount / pageSize) - 1, 0)
     } yield
       LinkedResponse(

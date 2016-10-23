@@ -46,7 +46,7 @@ object Main extends AppServer {
     PrintlnLoggingInterpreter
   )
 
-  val appRoutes = frameworkifyRoutes(Routes.appRoutes, interpreter)
+  val appRoutes = frameworkifyRoutes(Routes.withHeaders(Routes.appRoutes), interpreter)
 
   val routes: Intent = appRoutes orElse NoRoute()
 

@@ -9,6 +9,6 @@ package object app {
 
   type MaybeTime = Option[OffsetDateTime]
 
-  def parseTime(date: String) = Try(OffsetDateTime.parse(date)).toOption
+  def parseTime(date: String) = Try(OffsetDateTime.parse(date.replace(" ", "+"))).toOption
 
 }
