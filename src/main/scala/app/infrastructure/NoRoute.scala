@@ -9,7 +9,7 @@ import scala.concurrent.Future
 object NoRoute {
 
   def apply(responseContent: String = "page not found"): Intent = {
-    case Path(path) =>
+    case Path(_) =>
       Future.successful(NotFound ~> HtmlContent ~> responseString(responseContent))
   }
 }

@@ -3,7 +3,7 @@ package app.interpreter.sql
 import java.sql.Timestamp
 
 //import MyPostgresDriver.api._
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 
 object SnapshotsTable {
   type Fields = (String, String, String, Timestamp, String)

@@ -1,16 +1,14 @@
-import org.scalafmt.sbt.ScalaFmtPlugin.autoImport._
-
 name := "event-stream-api"
 
 version := scala.util.Properties.envOrElse("APP_VERSION", "latest")
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.13.1"
 
-sbtVersion := "0.13.11"
+sbtVersion := "1.3.9"
 
 scalacOptions ++= Seq(
   "-Xfatal-warnings",
-  "-Ywarn-unused-import",
+  "-Ywarn-unused",
   "-Xlint",
   "-feature",
   "-deprecation",
@@ -20,9 +18,10 @@ scalacOptions ++= Seq(
 //    "-Xlog-implicits"
 )
 
-val unfilteredLibraryVersion = "0.8.4"
-
-val circeVersion = "0.5.1"
+val unfilteredLibraryVersion = "0.10.0-M7"
+val circeVersion             = "0.12.3"
+val specsVersion             = "4.8.3"
+val catsVersion              = "2.1.0"
 
 resolvers += "cwmyers" at "https://raw.github.com/cwmyers/mvn-repo/master/releases/"
 
@@ -30,24 +29,24 @@ resolvers += "cwmyers" at "https://raw.github.com/cwmyers/mvn-repo/master/releas
 
 
 libraryDependencies ++= Seq(
-  "net.databinder"                         %% "unfiltered-netty-server"  % unfilteredLibraryVersion,
-  "net.databinder"                         %% "unfiltered-directives"    % unfilteredLibraryVersion,
-  "net.databinder"                         %% "unfiltered-filter"        % unfilteredLibraryVersion,
-  "com.github.mpilquist"                   %% "simulacrum"               % "0.7.0",
+  "ws.unfiltered"                         %% "unfiltered-filter"        % unfilteredLibraryVersion,
+  "ws.unfiltered"                         %% "unfiltered-directives"    % unfilteredLibraryVersion,
+  "ws.unfiltered"                         %% "unfiltered-filter"        % unfilteredLibraryVersion,
+  "ws.unfiltered"                         %% "unfiltered-netty-server"  % unfilteredLibraryVersion,
   "commons-lang"                           %  "commons-lang"             % "2.6",
-  "org.typelevel"                          %% "cats"                     % "0.7.2",
-  "com.github.benhutchison"                %% "mouse"                    % "0.5",
+  "org.typelevel"                          %% "cats-core"                % catsVersion,
+  "org.typelevel"                          %% "cats-free"                % catsVersion,
+  "org.typelevel"                          %% "mouse"                    % "0.24",
   "org.slf4j"                              %  "jul-to-slf4j"             % "1.7.7",
   "ch.qos.logback"                         %  "logback-classic"          % "1.1.2",
-  "com.typesafe.slick"                     %% "slick"                    % "3.1.1",
-  "com.github.tminglei"                    %% "slick-pg"                 % "0.14.3",
+  "com.typesafe.slick"                     %% "slick"                    % "3.3.2",
+  "com.github.tminglei"                    %% "slick-pg"                 % "0.19.0",
   "postgresql"                             %  "postgresql"               % "9.1-901.jdbc4",
   "io.circe"                               %% "circe-core"               % circeVersion,
   "io.circe"                               %% "circe-generic"            % circeVersion,
   "io.circe"                               %% "circe-parser"             % circeVersion,
-  "io.circe"                               %% "circe-optics"             % circeVersion,
-  "org.specs2"                             %% "specs2-core"              % "3.8.5"       % "test",
-  "org.specs2"                             %% "specs2-scalacheck"        % "3.8.5"       % "test"
+  "org.specs2"                             %% "specs2-core"              % specsVersion       % "test",
+  "org.specs2"                             %% "specs2-scalacheck"        % specsVersion       % "test"
 )
 
 
@@ -55,15 +54,14 @@ mainClass in Compile := Some("app.Main") //Used in Universal packageBin
 
 mainClass in (Compile, run) := Some("app.infrastructure.Dev") //Used from normal sbt
 
-scalafmtConfig in ThisBuild := Some(file(".scalafmt"))
-
-compileInputs in (Compile, compile) <<=
-  (compileInputs in (Compile, compile)) dependsOn (scalafmt in Compile)
+//compileInputs in (Compile, compile) <<=
+//  (compileInputs in (Compile, compile)) dependsOn (scalafmt in Compile)
 
 
 enablePlugins(JavaServerAppPackaging, DockerPlugin)
 
-dockerRepository := Some("docker.chrisandjo.com:5000")
+// Add your own repo here
+dockerRepository := Some("docker.pkg.github.com/cwmyers")
 
 dockerBaseImage := scala.util.Properties.envOrElse("DOCKER_IMAGE", "openjdk:latest")
 

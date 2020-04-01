@@ -2,10 +2,8 @@ package app.model
 
 import java.time.OffsetDateTime
 
-import cats.data.Xor
+import cats.implicits._
 import io.circe._
-
-import scala.util.Try
 
 object Codecs {
   private def stringEncoder[A <: String]: Encoder[A] = Encoder.instance(Json.fromString)
@@ -13,8 +11,8 @@ object Codecs {
   implicit def DateDecoder: Decoder[OffsetDateTime] =
     Decoder[String].emap(
       dateString =>
-        Xor
-          .fromTry(Try(OffsetDateTime.parse(dateString)))
+        Either
+          .catchNonFatal(OffsetDateTime.parse(dateString))
           .leftMap(_ => "Unable to parse date, it must be in ISO8601 format")
     )
 

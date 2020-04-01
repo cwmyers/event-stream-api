@@ -21,7 +21,7 @@ object Routes {
       ListEventsController.listForEntity(req, EntityId(entityId))
     case req @ GET(Path(Seg("entity" :: entityId :: Nil))) =>
       GetEntityController.get(EntityId(entityId), req)
-    case req @ POST(Path(Seg("snapshot" :: entityId :: systemName :: time :: Nil))) =>
+    case POST(Path(Seg("snapshot" :: entityId :: systemName :: time :: Nil))) =>
       SnapshotEntityController.snapshot(EntityId(entityId), SystemName(systemName), time)
 
   }

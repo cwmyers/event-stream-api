@@ -5,8 +5,6 @@ import cats.Foldable
 import cats.instances.all._
 import cats.syntax.all._
 
-import scala.language.higherKinds
-
 object LinksMaker {
   def createLinks[F[_]: Foldable](endpointName: String,
                                   id: F[EntityId],

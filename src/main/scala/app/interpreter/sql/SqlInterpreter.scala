@@ -3,19 +3,17 @@ package app.interpreter.sql
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 
+import app.MaybeTime
 import app.action._
 import app.interpreter.EventStoreInterpreter
+import app.interpreter.sql.MyPostgresDriver.api._
 import app.model.{EntityId, SystemName}
-import slick.dbio.Effect.Write
-
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.language.higherKinds
-import MyPostgresDriver.api._
-import app.MaybeTime
 import cats.implicits._
+import slick.dbio.Effect.Write
 import slick.dbio.{DBIOAction, Effect, NoStream}
 
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class SqlInterpreter(db: SlickDatabase)(implicit ec: ExecutionContext)
     extends EventStoreInterpreter {

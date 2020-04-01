@@ -1,11 +1,10 @@
 import java.time.OffsetDateTime
 
-import cats.data.Xor
 
 import scala.util.Try
 
 package object app {
-  type ErrorOr[A] = AppError Xor A
+  type ErrorOr[A] = Either[AppError, A]
 
   type MaybeTime = Option[OffsetDateTime]
 
